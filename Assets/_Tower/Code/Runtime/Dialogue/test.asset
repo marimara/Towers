@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2fe38ed7411c3b41805db5b94c10718, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  Nodes:
+  - Id: 0
+    Speaker: 2
+    Text: New dialogue...
+    Choices: []
+    NextNode: 0
+    <EditorPosition>k__BackingField: {x: 100, y: 100}
+  - Id: 1
+    Speaker: 2
+    Text: New dialogue...
+    Choices: []
+    NextNode: 0
+    <EditorPosition>k__BackingField: {x: 466.66675, y: 97.66666}

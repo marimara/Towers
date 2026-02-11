@@ -1,0 +1,728 @@
+fileFormatVersion: 2
+guid: d025843ab90d6bf4aaf3ab748099e32d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6758807888896527115
+    second: Dialogue UI Atlas_0
+  - first:
+      213: 5365270536273604449
+    second: Dialogue UI Atlas_1
+  - first:
+      213: 5417079298996331266
+    second: Dialogue UI Atlas_2
+  - first:
+      213: -1746430885162369235
+    second: Dialogue UI Atlas_3
+  - first:
+      213: -3826596672469269215
+    second: Dialogue UI Atlas_4
+  - first:
+      213: -7650148007196223335
+    second: Dialogue UI Atlas_5
+  - first:
+      213: 67810339726750087
+    second: Dialogue UI Atlas_6
+  - first:
+      213: 5011736456701184247
+    second: Dialogue UI Atlas_7
+  - first:
+      213: -8211089014662122785
+    second: Dialogue UI Atlas_8
+  - first:
+      213: 7599103560784731407
+    second: Dialogue UI Atlas_9
+  - first:
+      213: 819299817306044888
+    second: Dialogue UI Atlas_10
+  - first:
+      213: -6139496590708171344
+    second: Dialogue UI Atlas_11
+  - first:
+      213: 2921789416445971917
+    second: Dialogue UI Atlas_12
+  - first:
+      213: -4014423354635380940
+    second: Dialogue UI Atlas_13
+  - first:
+      213: -5349123478136371279
+    second: Dialogue UI Atlas_14
+  - first:
+      213: -2402990316703845057
+    second: Dialogue UI Atlas_15
+  - first:
+      213: -2218308990320663291
+    second: Dialogue UI Atlas_16
+  - first:
+      213: 3025480418113766156
+    second: Dialogue UI Atlas_17
+  - first:
+      213: -313631255822769029
+    second: Dialogue UI Atlas_18
+  - first:
+      213: 312525927917645168
+    second: Dialogue UI Atlas_19
+  - first:
+      213: 2553898361421144115
+    second: Dialogue UI Atlas_20
+  - first:
+      213: -6157852342503104618
+    second: Dialogue UI Atlas_21
+  - first:
+      213: 2354505688401127522
+    second: Dialogue UI Atlas_22
+  - first:
+      213: 4967887993217300048
+    second: Dialogue UI Atlas_23
+  - first:
+      213: 4608680206311280983
+    second: Dialogue UI Atlas_24
+  - first:
+      213: -5919969902706575651
+    second: Dialogue UI Atlas_25
+  - first:
+      213: -2893624595341977183
+    second: Dialogue UI Atlas_26
+  - first:
+      213: -1433668627662862707
+    second: Dialogue UI Atlas_27
+  - first:
+      213: -3108586359989283567
+    second: Dialogue UI Atlas_28
+  - first:
+      213: 7785180633406819921
+    second: Dialogue UI Atlas_29
+  - first:
+      213: -8201564541718103441
+    second: Dialogue UI Atlas_30
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: DialogueBox_Small
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 786
+        width: 603
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 66, y: 35, z: 62, w: 29}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0b09ca17fb1ccd50800000000000000
+      internalID: 6758807888896527115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NamePlate_Active
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 878
+        width: 441
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2036cc8ebe45d2b40800000000000000
+      internalID: 5417079298996331266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Next
+      rect:
+        serializedVersion: 2
+        x: 1139
+        y: 884
+        width: 85
+        height: 88
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 2}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2f3029ec5e63c7e0800000000000000
+      internalID: -1746430885162369235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Auto
+      rect:
+        serializedVersion: 2
+        x: 1232
+        y: 888
+        width: 89
+        height: 83
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12507ceb99235eac0800000000000000
+      internalID: -3826596672469269215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Log
+      rect:
+        serializedVersion: 2
+        x: 1413
+        y: 886
+        width: 86
+        height: 87
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99818ef6be635d590800000000000000
+      internalID: -7650148007196223335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Icon_Skip
+      rect:
+        serializedVersion: 2
+        x: 1326
+        y: 889
+        width: 82
+        height: 82
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd2b3fd9b0a5c0e80800000000000000
+      internalID: -8211089014662122785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DialogueBox_Medium
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 464
+        width: 633
+        height: 299
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 52, y: 41, z: 49, w: 35}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0ddaff3d60757960800000000000000
+      internalID: 7599103560784731407
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NamePlate_Normal
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 771
+        width: 426
+        height: 96
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d9b11fc7dcbe5b00800000000000000
+      internalID: 819299817306044888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Frame_Top
+      rect:
+        serializedVersion: 2
+        x: 694
+        y: 718
+        width: 417
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bd1e1311602ccaa0800000000000000
+      internalID: -6139496590708171344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_12
+      rect:
+        serializedVersion: 2
+        x: 1133
+        y: 768
+        width: 379
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcd02c37ef74c8820800000000000000
+      internalID: 2921789416445971917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Frame_Bottom
+      rect:
+        serializedVersion: 2
+        x: 690
+        y: 661
+        width: 428
+        height: 37
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4371de07a37e948c0800000000000000
+      internalID: -4014423354635380940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_14
+      rect:
+        serializedVersion: 2
+        x: 687
+        y: 540
+        width: 433
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b7caf9998814c5b0800000000000000
+      internalID: -5349123478136371279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_15
+      rect:
+        serializedVersion: 2
+        x: 1135
+        y: 658
+        width: 375
+        height: 89
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f35f92ed90dd6aed0800000000000000
+      internalID: -2402990316703845057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_16
+      rect:
+        serializedVersion: 2
+        x: 1134
+        y: 539
+        width: 375
+        height: 90
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 505a1e5f9bbf631e0800000000000000
+      internalID: -2218308990320663291
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: DialogueBox_Large
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 91
+        width: 634
+        height: 352
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 64, y: 50, z: 62, w: 39}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c03429c196aacf920800000000000000
+      internalID: 3025480418113766156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Frame_Middle
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 471
+        width: 418
+        height: 38
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b746936d802c5abf0800000000000000
+      internalID: -313631255822769029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_19
+      rect:
+        serializedVersion: 2
+        x: 693
+        y: 334
+        width: 424
+        height: 97
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07d61a4fca0565400800000000000000
+      internalID: 312525927917645168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_21
+      rect:
+        serializedVersion: 2
+        x: 1132
+        y: 426
+        width: 380
+        height: 89
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69f9bc19be9ea8aa0800000000000000
+      internalID: -6157852342503104618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_23
+      rect:
+        serializedVersion: 2
+        x: 1397
+        y: 293
+        width: 113
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05635af0fcb71f440800000000000000
+      internalID: 4967887993217300048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_24
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 222
+        width: 659
+        height: 95
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 751de84da3255ff30800000000000000
+      internalID: 4608680206311280983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_25
+      rect:
+        serializedVersion: 2
+        x: 691
+        y: 92
+        width: 658
+        height: 115
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd6bb242dba08dda0800000000000000
+      internalID: -5919969902706575651
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialogue UI Atlas_27
+      rect:
+        serializedVersion: 2
+        x: 1089
+        y: 219
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d868882aaf59a1ce0800000000000000
+      internalID: -1433668627662862707
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: c09222412eb21814281eff57f6679d29
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      Dialogue UI Atlas_0: -1437625373
+      Dialogue UI Atlas_1: 5365270536273604449
+      Dialogue UI Atlas_12: 2921789416445971917
+      Dialogue UI Atlas_14: -5349123478136371279
+      Dialogue UI Atlas_15: -2402990316703845057
+      Dialogue UI Atlas_16: -2218308990320663291
+      Dialogue UI Atlas_19: 312525927917645168
+      Dialogue UI Atlas_20: 2553898361421144115
+      Dialogue UI Atlas_21: -6157852342503104618
+      Dialogue UI Atlas_22: 2354505688401127522
+      Dialogue UI Atlas_23: 4967887993217300048
+      Dialogue UI Atlas_24: 4608680206311280983
+      Dialogue UI Atlas_25: -5919969902706575651
+      Dialogue UI Atlas_26: -2893624595341977183
+      Dialogue UI Atlas_27: -1433668627662862707
+      Dialogue UI Atlas_28: -3108586359989283567
+      Dialogue UI Atlas_29: 7785180633406819921
+      Dialogue UI Atlas_30: -8201564541718103441
+      Dialogue UI Atlas_6: 67810339726750087
+      Dialogue UI Atlas_7: 5011736456701184247
+      DialogueBox_Large: 3025480418113766156
+      DialogueBox_Medium: 7599103560784731407
+      DialogueBox_Small: 6758807888896527115
+      Frame_Bottom: -4014423354635380940
+      Frame_Middle: -313631255822769029
+      Frame_Top: -6139496590708171344
+      Icon_Auto: -3826596672469269215
+      Icon_Log: -7650148007196223335
+      Icon_Next: -1746430885162369235
+      Icon_Skip: -8211089014662122785
+      NamePlate_Active: 5417079298996331266
+      NamePlate_Normal: 819299817306044888
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

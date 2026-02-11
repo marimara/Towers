@@ -1,0 +1,623 @@
+fileFormatVersion: 2
+guid: 1cc4c4bbb9a15fb419ce040d2e74ae03
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3963003049609741766
+    second: UI_Atlas_Dialogue_0
+  - first:
+      213: 7074533922391935975
+    second: UI_Atlas_Dialogue_1
+  - first:
+      213: 2639990239439223241
+    second: UI_Atlas_Dialogue_2
+  - first:
+      213: -7141859712152012428
+    second: UI_Atlas_Dialogue_3
+  - first:
+      213: -7636326096709858010
+    second: UI_Atlas_Dialogue_4
+  - first:
+      213: 6837766292976955664
+    second: UI_Atlas_Dialogue_5
+  - first:
+      213: 927311964836056836
+    second: UI_Atlas_Dialogue_6
+  - first:
+      213: -9056793479544399561
+    second: UI_Atlas_Dialogue_7
+  - first:
+      213: 5525435948308284900
+    second: UI_Atlas_Dialogue_8
+  - first:
+      213: 316929932301502554
+    second: UI_Atlas_Dialogue_9
+  - first:
+      213: -3203215613666728158
+    second: UI_Atlas_Dialogue_10
+  - first:
+      213: -438504979993919805
+    second: UI_Atlas_Dialogue_11
+  - first:
+      213: 4006353759103838057
+    second: UI_Atlas_Dialogue_12
+  - first:
+      213: 226468906577668983
+    second: UI_Atlas_Dialogue_13
+  - first:
+      213: 6262888143191540917
+    second: UI_Atlas_Dialogue_14
+  - first:
+      213: 857797016843417217
+    second: UI_Atlas_Dialogue_15
+  - first:
+      213: 5356390296838328099
+    second: UI_Atlas_Dialogue_16
+  - first:
+      213: 7406496133616063464
+    second: UI_Atlas_Dialogue_17
+  - first:
+      213: -3734079593644419716
+    second: UI_Atlas_Dialogue_18
+  - first:
+      213: -7148483993925844060
+    second: UI_Atlas_Dialogue_19
+  - first:
+      213: -7545194004462083677
+    second: UI_Atlas_Dialogue_20
+  - first:
+      213: 1072364837684787475
+    second: UI_Atlas_Dialogue_21
+  - first:
+      213: 2412895096430184634
+    second: UI_Atlas_Dialogue_22
+  - first:
+      213: -7955972779938168457
+    second: UI_Atlas_Dialogue_23
+  - first:
+      213: 8712623800266142822
+    second: UI_Atlas_Dialogue_24
+  - first:
+      213: 7979750653148630060
+    second: UI_Atlas_Dialogue_25
+  - first:
+      213: -5449394689584386167
+    second: UI_Atlas_Dialogue_26
+  - first:
+      213: -7961345937338336631
+    second: UI_Atlas_Dialogue_27
+  - first:
+      213: 9123142714440445430
+    second: UI_Atlas_Dialogue_28
+  - first:
+      213: -2342769074293329816
+    second: UI_Atlas_Dialogue_29
+  - first:
+      213: 6643932595465012512
+    second: UI_Atlas_Dialogue_30
+  - first:
+      213: 4949972293994962233
+    second: UI_Atlas_Dialogue_31
+  - first:
+      213: 6179293803736791506
+    second: UI_Atlas_Dialogue_32
+  - first:
+      213: -2482848101521500732
+    second: UI_Atlas_Dialogue_33
+  - first:
+      213: 817357174442651013
+    second: UI_Atlas_Dialogue_34
+  - first:
+      213: 4493487124568917946
+    second: UI_Atlas_Dialogue_35
+  - first:
+      213: -7931496196194956572
+    second: UI_Atlas_Dialogue_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_0
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 728
+        width: 912
+        height: 246
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 48, y: 37, z: 46, w: 33}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3ab83829b59009c0800000000000000
+      internalID: -3963003049609741766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_3
+      rect:
+        serializedVersion: 2
+        x: 1163
+        y: 870
+        width: 107
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47971855e6403ec90800000000000000
+      internalID: -7141859712152012428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_4
+      rect:
+        serializedVersion: 2
+        x: 1376
+        y: 868
+        width: 107
+        height: 104
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62d4090cfd1560690800000000000000
+      internalID: -7636326096709858010
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_12
+      rect:
+        serializedVersion: 2
+        x: 1055
+        y: 868
+        width: 100
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9676fef648d699730800000000000000
+      internalID: 4006353759103838057
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_13
+      rect:
+        serializedVersion: 2
+        x: 1272
+        y: 871
+        width: 103
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77bab394544942300800000000000000
+      internalID: 226468906577668983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_15
+      rect:
+        serializedVersion: 2
+        x: 1038
+        y: 702
+        width: 462
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 58, y: 17, z: 56, w: 13}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 186775e87d187eb00800000000000000
+      internalID: 857797016843417217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_20
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 491
+        width: 910
+        height: 196
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 59, y: 41, z: 55, w: 25}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a161a277061a4790800000000000000
+      internalID: -7545194004462083677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_22
+      rect:
+        serializedVersion: 2
+        x: 1033
+        y: 551
+        width: 470
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 60, y: 19, z: 60, w: 16}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab8c00f5e435c7120800000000000000
+      internalID: 2412895096430184634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_24
+      rect:
+        serializedVersion: 2
+        x: 1036
+        y: 404
+        width: 468
+        height: 110
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 67, y: 20, z: 64, w: 16}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6643a745f2579e870800000000000000
+      internalID: 8712623800266142822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_26
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 347
+        width: 441
+        height: 93
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98f2c66e66cdf54b0800000000000000
+      internalID: -5449394689584386167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_27
+      rect:
+        serializedVersion: 2
+        x: 492
+        y: 436
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98af2fe0d0e938190800000000000000
+      internalID: -7961345937338336631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_28
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 348
+        width: 403
+        height: 91
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fd6a6956f9eb9e70800000000000000
+      internalID: 9123142714440445430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_32
+      rect:
+        serializedVersion: 2
+        x: 1349
+        y: 232
+        width: 117
+        height: 94
+      alignment: 9
+      pivot: {x: 0.51980776, y: 0.51436013}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d9f086a9f241c550800000000000000
+      internalID: 6179293803736791506
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_33
+      rect:
+        serializedVersion: 2
+        x: 569
+        y: 211
+        width: 653
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c5de8d6ec62b8dd0800000000000000
+      internalID: -2482848101521500732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_35
+      rect:
+        serializedVersion: 2
+        x: 56
+        y: 224
+        width: 441
+        height: 89
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab7c8b67bb21c5e30800000000000000
+      internalID: 4493487124568917946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: UI_Atlas_Dialogue_38
+      rect:
+        serializedVersion: 2
+        x: 567
+        y: 94
+        width: 654
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 143b19ce88da99e4e9da94bbc07e6987
+      internalID: 899935647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 3bbf8cc2212e3394cbc391a8d7a3bd0a
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
+    nameFileIdTable:
+      UI_Atlas_Dialogue_0: -3963003049609741766
+      UI_Atlas_Dialogue_1: 7074533922391935975
+      UI_Atlas_Dialogue_10: -3203215613666728158
+      UI_Atlas_Dialogue_11: -438504979993919805
+      UI_Atlas_Dialogue_12: 4006353759103838057
+      UI_Atlas_Dialogue_13: 226468906577668983
+      UI_Atlas_Dialogue_14: 6262888143191540917
+      UI_Atlas_Dialogue_15: 857797016843417217
+      UI_Atlas_Dialogue_16: 5356390296838328099
+      UI_Atlas_Dialogue_17: 7406496133616063464
+      UI_Atlas_Dialogue_18: -3734079593644419716
+      UI_Atlas_Dialogue_19: -7148483993925844060
+      UI_Atlas_Dialogue_2: 2639990239439223241
+      UI_Atlas_Dialogue_20: -7545194004462083677
+      UI_Atlas_Dialogue_21: 1072364837684787475
+      UI_Atlas_Dialogue_22: 2412895096430184634
+      UI_Atlas_Dialogue_23: -7955972779938168457
+      UI_Atlas_Dialogue_24: 8712623800266142822
+      UI_Atlas_Dialogue_25: 7979750653148630060
+      UI_Atlas_Dialogue_26: -5449394689584386167
+      UI_Atlas_Dialogue_27: -7961345937338336631
+      UI_Atlas_Dialogue_28: 9123142714440445430
+      UI_Atlas_Dialogue_29: -2342769074293329816
+      UI_Atlas_Dialogue_3: -7141859712152012428
+      UI_Atlas_Dialogue_30: 6643932595465012512
+      UI_Atlas_Dialogue_31: 4949972293994962233
+      UI_Atlas_Dialogue_32: 6179293803736791506
+      UI_Atlas_Dialogue_33: -2482848101521500732
+      UI_Atlas_Dialogue_34: 817357174442651013
+      UI_Atlas_Dialogue_35: 4493487124568917946
+      UI_Atlas_Dialogue_36: -7931496196194956572
+      UI_Atlas_Dialogue_37: 814377943
+      UI_Atlas_Dialogue_38: 899935647
+      UI_Atlas_Dialogue_39: 2120219941
+      UI_Atlas_Dialogue_4: -7636326096709858010
+      UI_Atlas_Dialogue_40: 1214918574
+      UI_Atlas_Dialogue_5: 6837766292976955664
+      UI_Atlas_Dialogue_6: 927311964836056836
+      UI_Atlas_Dialogue_7: -9056793479544399561
+      UI_Atlas_Dialogue_8: 5525435948308284900
+      UI_Atlas_Dialogue_9: 316929932301502554
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
