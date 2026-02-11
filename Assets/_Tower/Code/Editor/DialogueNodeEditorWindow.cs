@@ -25,12 +25,24 @@ public class DialogueNodeEditorWindow : EditorWindow
     private void OnGUI()
     {
         DrawToolbar();
-        HandlePanZoom();
 
-        if (dialogueData == null) return;
+        if (dialogueData == null)
+            return;
+
+        Rect canvasRect = new Rect(0, EditorStyles.toolbar.fixedHeight, position.width, position.height - EditorStyles.toolbar.fixedHeight);
+
+        GUI.BeginGroup(canvasRect);
+
+        HandlePanZoom(canvasRect);
 
         Matrix4x4 old = GUI.matrix;
-        GUI.matrix = Matrix4x4.TRS(panOffset, Quaternion.identity, Vector3.one * zoom);
+
+        Vector2 pivot = canvasRect.size * 0.5f;
+        Matrix4x4 translation = Matrix4x4.TRS(panOffset + pivot, Quaternion.identity, Vector3.one);
+        Matrix4x4 scale = Matrix4x4.Scale(Vector3.one * zoom);
+        Matrix4x4 translationBack = Matrix4x4.TRS(-pivot, Quaternion.identity, Vector3.one);
+
+        GUI.matrix = translation * scale * translationBack;
 
         HandleLinking();
         DrawConnections();
@@ -38,9 +50,12 @@ public class DialogueNodeEditorWindow : EditorWindow
 
         GUI.matrix = old;
 
+        GUI.EndGroup();
+
         if (GUI.changed)
             EditorUtility.SetDirty(dialogueData);
     }
+
 
     #region Toolbar
 
@@ -294,7 +309,7 @@ public class DialogueNodeEditorWindow : EditorWindow
         if (Event.current.type != EventType.MouseDown) return false;
 
         float dist = HandleUtility.DistancePointBezier(
-            (Event.current.mousePosition - panOffset) / zoom,
+            (Event.current.mousePosition - panOffset - position.size * 0.5f) / zoom,
             start,
             end,
             start + Vector2.right * 80,
@@ -319,13 +334,20 @@ public class DialogueNodeEditorWindow : EditorWindow
         Handles.EndGUI();
     }
 
-    private void HandlePanZoom()
+    private void HandlePanZoom(Rect canvasRect)
     {
         Event e = Event.current;
 
         if (e.type == EventType.ScrollWheel)
         {
+            float oldZoom = zoom;
             zoom = Mathf.Clamp(zoom - e.delta.y * 0.03f, ZoomMin, ZoomMax);
+
+            Vector2 mousePos = e.mousePosition;
+
+            Vector2 delta = mousePos - panOffset;
+            panOffset -= delta - (delta * (zoom / oldZoom));
+
             e.Use();
         }
 
@@ -335,6 +357,7 @@ public class DialogueNodeEditorWindow : EditorWindow
             e.Use();
         }
     }
+
 
     private float GetNodeHeight(DialogueNode node)
     {
