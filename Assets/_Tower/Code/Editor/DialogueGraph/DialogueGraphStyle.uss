@@ -1,0 +1,27 @@
+.dialogue-node {
+    background-color: #1b1b1b;
+    border-radius: 12px;
+    border: 2px solid #444;
+}
+
+.dialogue-node .title {
+    background-color: #252525;
+    padding: 6px;
+    font-weight: bold;
+}
+
+.dialogue-node.left { border-color: #3a6cff; }
+.dialogue-node.right { border-color: #ff4a4a; }
+.dialogue-node.narrator { border-color: #999; }
+
+.dialogue-port {
+    width: 10px;
+    height: 10px;
+    background-color: #ccc;
+    border-radius: 50%;
+}
+
+TextField {
+    background-color: #101010;
+    color: #ddd;
+}
