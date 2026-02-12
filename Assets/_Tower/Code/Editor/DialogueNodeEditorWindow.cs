@@ -1,24 +1,21 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DialogueNodeEditorWindow : EditorWindow
 {
     private DialogueData dialogueData;
 
-    private Vector2 dragOffset;
-
-    private DialogueNode linkingNode;
-    private int linkingChoiceIndex = -1;
-
-    private int focusChoiceNode = -1;
-    private int focusChoiceIndex = -1;
-
-    // Zoom & Pan
-    private Vector2 panOffset;
+    private Vector2 pan;
     private float zoom = 1f;
 
     private const float ZoomMin = 0.4f;
-    private const float ZoomMax = 2f;
+    private const float ZoomMax = 2.5f;
+
+    private DialogueNode linkingNode;
+    private int linkingChoice = -1;
+
+    private Rect canvasRect = new Rect(-100000, -100000, 200000, 200000);
 
     [MenuItem("VN/Dialogue Node Editor")]
     public static void Open()
@@ -26,55 +23,36 @@ public class DialogueNodeEditorWindow : EditorWindow
         GetWindow<DialogueNodeEditorWindow>("Dialogue Editor");
     }
 
-    private void OnGUI()
+    void OnGUI()
     {
         DrawToolbar();
-        HandlePanAndZoom();
+        HandleInput();
 
-        Matrix4x4 oldMatrix = GUI.matrix;
-        GUI.matrix = Matrix4x4.TRS(
-            panOffset,
-            Quaternion.identity,
-            Vector3.one * zoom
-        );
+        if (dialogueData == null)
+            return;
 
-        if (dialogueData == null) return;
+        if (dialogueData.Nodes == null)
+            dialogueData.Nodes = new List<DialogueNode>();
 
-        HandleLinking();
+        DrawGrid();
+
+        Matrix4x4 old = GUI.matrix;
+        GUI.matrix = Matrix4x4.TRS(pan, Quaternion.identity, Vector3.one * zoom);
+
         DrawConnections();
+        DrawNodes();
 
-        BeginWindows();
+        GUI.matrix = old;
 
-        for (int i = 0; i < dialogueData.Nodes.Count; i++)
-        {
-            var node = dialogueData.Nodes[i];
-
-            Rect rect = new Rect(
-                node.EditorPosition.x,
-                node.EditorPosition.y,
-                280,
-                GetNodeHeight(node)
-            );
-
-            Rect newRect = GUI.Window(
-                i,
-                rect,
-                DrawNodeWindow,
-                $"Node {node.Id}"
-            );
-
-            node.EditorPosition = new Vector2(newRect.x, newRect.y);
-        }
-
-        EndWindows();
+        HandleContextMenu(); // <-- vamos adicionar isso
 
         if (GUI.changed)
             EditorUtility.SetDirty(dialogueData);
-
-        GUI.matrix = oldMatrix;
     }
 
-    private void DrawToolbar()
+    #region Toolbar
+
+    void DrawToolbar()
     {
         GUILayout.BeginHorizontal(EditorStyles.toolbar);
 
@@ -82,98 +60,116 @@ public class DialogueNodeEditorWindow : EditorWindow
             dialogueData,
             typeof(DialogueData),
             false,
-            GUILayout.Width(300)
-        );
+            GUILayout.Width(300));
 
-        if (dialogueData != null)
-        {
-            if (GUILayout.Button("➕ Add Node", EditorStyles.toolbarButton))
-            {
-                AddNode();
-            }
-        }
+        if (dialogueData && GUILayout.Button("➕ Add Node", EditorStyles.toolbarButton))
+            AddNode();
 
         GUILayout.EndHorizontal();
     }
 
-    private void AddNode()
+    #endregion
+
+    #region Input
+
+    void HandleInput()
     {
-        DialogueNode newNode = new DialogueNode();
+        Event e = Event.current;
 
-        newNode.Id = dialogueData.Nodes.Count;
-        newNode.Text = "New dialogue...";
-        newNode.Speaker = Speaker.Narrator;
+        if (e.type == EventType.ScrollWheel)
+        {
+            float oldZoom = zoom;
+            zoom = Mathf.Clamp(zoom - e.delta.y * 0.03f, ZoomMin, ZoomMax);
 
-        newNode.EditorPosition = new Vector2(
-            100 + dialogueData.Nodes.Count * 30,
-            100
-        );
+            Vector2 mouse = e.mousePosition;
+            pan += (mouse - pan) - (oldZoom / zoom) * (mouse - pan);
 
-        dialogueData.Nodes.Add(newNode);
-        EditorUtility.SetDirty(dialogueData);
+            e.Use();
+        }
+
+        if (e.type == EventType.MouseDrag && e.button == 2)
+        {
+            pan += e.delta;
+            e.Use();
+        }
     }
 
-    private void DrawNodeWindow(int id)
+    Vector2 ScreenToGraph(Vector2 pos)
     {
-        var node = dialogueData.Nodes[id];
+        return (pos - pan) / zoom;
+    }
 
-        Color oldColor = GUI.backgroundColor;
+    #endregion
 
-        switch (node.Speaker)
+    #region Grid
+
+    void DrawGrid()
+    {
+        int spacing = 40;
+        Handles.color = new Color(0, 0, 0, 0.25f);
+
+        Vector2 offset = new Vector2(pan.x % spacing, pan.y % spacing);
+
+        for (float x = offset.x; x < position.width; x += spacing)
+            Handles.DrawLine(new Vector3(x, 0), new Vector3(x, position.height));
+
+        for (float y = offset.y; y < position.height; y += spacing)
+            Handles.DrawLine(new Vector3(0, y), new Vector3(position.width, y));
+    }
+
+    #endregion
+
+    #region Nodes
+
+    void DrawNodes()
+    {
+        BeginWindows();
+
+        for (int i = 0; i < dialogueData.Nodes.Count; i++)
         {
-            case Speaker.Left:
-                GUI.backgroundColor = new Color(0.25f, 0.35f, 0.7f);
-                break;
+            DialogueNode node = dialogueData.Nodes[i];
 
-            case Speaker.Right:
-                GUI.backgroundColor = new Color(0.7f, 0.25f, 0.25f);
-                break;
+            Rect r = new Rect(
+                node.EditorPosition.x,
+                node.EditorPosition.y,
+                280,
+                GetHeight(node));
 
-            case Speaker.Narrator:
-                GUI.backgroundColor = new Color(0.4f, 0.4f, 0.4f);
-                break;
+            r = GUI.Window(i, r, DrawNodeWindow, $"Node {node.Id}");
+            node.EditorPosition = r.position;
         }
+
+        EndWindows();
+    }
+
+    void DrawNodeWindow(int id)
+    {
+        DialogueNode node = dialogueData.Nodes[id];
+
+        Color old = GUI.backgroundColor;
+        GUI.backgroundColor = GetSpeakerColor(node.Speaker);
 
         GUILayout.BeginVertical("box");
 
-        GUILayout.BeginHorizontal();
-        GUILayout.Label($"Node {node.Id}", EditorStyles.boldLabel);
-
-        if (GUILayout.Button("✖", GUILayout.Width(24)))
-        {
-            DeleteNode(id);
-            return;
-        }
-
-        GUILayout.EndHorizontal();
-
         node.Speaker = (Speaker)EditorGUILayout.EnumPopup(node.Speaker);
+        node.Text = EditorGUILayout.TextArea(node.Text, GUILayout.Height(50));
 
-        node.Text = EditorGUILayout.TextArea(
-            node.Text,
-            GUILayout.Height(50)
-        );
-
-        GUILayout.Space(6);
+        GUILayout.Space(4);
         GUILayout.Label("Choices:");
 
         if (node.Choices == null)
-            node.Choices = new();
+            node.Choices = new List<DialogueChoice>();
 
         for (int i = 0; i < node.Choices.Count; i++)
         {
-            GUI.backgroundColor = new Color(0.25f, 0.6f, 0.3f);
-
             GUILayout.BeginHorizontal("box");
 
-            node.Choices[i].Text = EditorGUILayout.TextField(
-                node.Choices[i].Text
-            );
+            node.Choices[i].Text = EditorGUILayout.TextField(node.Choices[i].Text);
 
             if (GUILayout.Button("○", GUILayout.Width(22)))
             {
                 linkingNode = node;
-                linkingChoiceIndex = i;
+                linkingChoice = i;
             }
 
             if (GUILayout.Button("✖", GUILayout.Width(22)))
@@ -185,232 +181,194 @@ public class DialogueNodeEditorWindow : EditorWindow
             GUILayout.EndHorizontal();
         }
 
-        GUI.backgroundColor = new Color(0.25f, 0.6f, 0.3f);
-
         if (GUILayout.Button("+ Add Choice"))
+            node.Choices.Add(new DialogueChoice { Text = "New choice...", NextNode = -1 });
+
+        if (GUILayout.Button("Delete Node"))
         {
-            node.Choices.Add(new DialogueChoice
-            {
-                Text = "New choice...",
-                NextNode = -1
-            });
+            dialogueData.Nodes.RemoveAt(id);
+            Reindex();
+            return;
         }
 
         GUILayout.EndVertical();
 
-        GUI.backgroundColor = oldColor;
+        GUI.backgroundColor = old;
 
         GUI.DragWindow();
     }
 
-    private void DrawConnections()
+    #endregion
+
+    #region Connections
+
+    void DrawConnections()
     {
         Event e = Event.current;
 
-        foreach (var node in dialogueData.Nodes)
+        foreach (DialogueNode node in dialogueData.Nodes)
         {
             if (node.Choices == null) continue;
 
             for (int i = 0; i < node.Choices.Count; i++)
             {
-                var choice = node.Choices[i];
+                int next = node.Choices[i].NextNode;
+                if (next < 0 || next >= dialogueData.Nodes.Count) continue;
 
-                if (choice.NextNode < 0 ||
-                    choice.NextNode >= dialogueData.Nodes.Count)
-                    continue;
+                DialogueNode target = dialogueData.Nodes[next];
 
-                var target = dialogueData.Nodes[choice.NextNode];
-
-                Vector2 start = new Vector2(
-                    node.EditorPosition.x + 280,
-                    node.EditorPosition.y + 120 + i * 40
-                );
-
-                Vector2 end = new Vector2(
-                    target.EditorPosition.x,
-                    target.EditorPosition.y + GetNodeHeight(target) * 0.5f
-                );
+                Vector2 start = node.EditorPosition + new Vector2(280, 80 + i * 38);
+                Vector2 end = target.EditorPosition + new Vector2(0, GetHeight(target) * 0.5f);
 
                 DrawBezier(start, end, Color.cyan);
 
                 if (e.type == EventType.MouseDown &&
-                    IsMouseOverConnection(start, end))
+                    DistanceToBezier(ScreenToGraph(e.mousePosition), start, end) < 10f)
                 {
-                    choice.NextNode = -1;
+                    node.Choices[i].NextNode = -1;
                     e.Use();
-                    EditorUtility.SetDirty(dialogueData);
                 }
             }
         }
+
+        if (linkingNode != null)
+            DrawTempLink();
     }
 
-    private void DrawBezier(Vector2 start, Vector2 end, Color color)
+    void DrawTempLink()
+    {
+        Vector2 mouse = ScreenToGraph(Event.current.mousePosition);
+
+        Vector2 start = linkingNode.EditorPosition +
+                        new Vector2(280, 80 + linkingChoice * 38);
+
+        DrawBezier(start, mouse, Color.yellow);
+
+        if (Event.current.type == EventType.MouseUp)
+        {
+            foreach (DialogueNode target in dialogueData.Nodes)
+            {
+                Rect r = new Rect(
+                    target.EditorPosition,
+                    new Vector2(280, GetHeight(target)));
+
+                if (r.Contains(mouse) && target != linkingNode)
+                {
+                    linkingNode.Choices[linkingChoice].NextNode = target.Id;
+                    break;
+                }
+            }
+
+            linkingNode = null;
+            linkingChoice = -1;
+        }
+
+        Repaint();
+    }
+
+    void DrawBezier(Vector2 start, Vector2 end, Color col)
     {
         Handles.BeginGUI();
-
         Handles.DrawBezier(
             start,
             end,
             start + Vector2.right * 80,
             end + Vector2.left * 80,
-            color,
+            col,
             null,
-            3f
-        );
-
+            3f);
         Handles.EndGUI();
     }
 
-    private void DeleteNode(int index)
+    float DistanceToBezier(Vector2 p, Vector2 a, Vector2 b)
     {
-        dialogueData.Nodes.RemoveAt(index);
-        ReindexNodes();
+        return HandleUtility.DistancePointBezier(
+            p,
+            a,
+            b,
+            a + Vector2.right * 80,
+            b + Vector2.left * 80);
+    }
+
+    #endregion
+
+    #region Utils
+
+    void AddNode()
+    {
+        Vector2 graphCenter = ScreenToGraph(position.size * 0.5f);
+
+        DialogueNode n = new DialogueNode
+        {
+            Id = dialogueData.Nodes.Count,
+            Text = "New dialogue...",
+            Speaker = Speaker.Narrator,
+            EditorPosition = graphCenter
+        };
+
+        dialogueData.Nodes.Add(n);
         EditorUtility.SetDirty(dialogueData);
     }
 
-    private void ReindexNodes()
+
+    void Reindex()
     {
         for (int i = 0; i < dialogueData.Nodes.Count; i++)
-        {
             dialogueData.Nodes[i].Id = i;
-        }
 
-        foreach (var node in dialogueData.Nodes)
-        {
-            if (node.NextNode >= dialogueData.Nodes.Count)
-                node.NextNode = -1;
-
-            if (node.Choices != null)
-            {
-                foreach (var choice in node.Choices)
-                {
-                    if (choice.NextNode >= dialogueData.Nodes.Count)
-                        choice.NextNode = -1;
-                }
-            }
-        }
+        foreach (var n in dialogueData.Nodes)
+            if (n.Choices != null)
+                foreach (var c in n.Choices)
+                    if (c.NextNode >= dialogueData.Nodes.Count)
+                        c.NextNode = -1;
     }
 
-    private void HandleLinking()
+    float GetHeight(DialogueNode n)
     {
-        if (linkingNode == null || linkingChoiceIndex == -1)
-            return;
-
-        Event e = Event.current;
-
-        Vector2 mousePos = (e.mousePosition - panOffset) / zoom;
-
-        DrawTemporaryConnection(mousePos);
-
-        if (e.type != EventType.MouseUp)
-            return;
-
-        foreach (var target in dialogueData.Nodes)
-        {
-            Rect rect = new Rect(
-                target.EditorPosition.x,
-                target.EditorPosition.y,
-                280,
-                GetNodeHeight(target)
-            );
-
-            if (!rect.Contains(mousePos)) continue;
-            if (target == linkingNode) break;
-
-            linkingNode.Choices[linkingChoiceIndex].NextNode = target.Id;
-
-            linkingNode = null;
-            linkingChoiceIndex = -1;
-
-            EditorUtility.SetDirty(dialogueData);
-            e.Use();
-            break;
-        }
+        int c = n.Choices != null ? n.Choices.Count : 0;
+        return 140 + c * 38;
     }
 
-    private void DrawTemporaryConnection(Vector2 mousePos)
+    Color GetSpeakerColor(Speaker s)
     {
-        if (linkingNode == null) return;
-
-        Vector2 start = new Vector2(
-            linkingNode.EditorPosition.x + 280,
-            linkingNode.EditorPosition.y + 80
-        );
-
-        DrawBezier(start, mousePos, Color.yellow);
-        Repaint();
-    }
-
-    private void CreateChoiceLink(DialogueNode from, DialogueNode to)
-    {
-        if (from.Choices == null)
-            from.Choices = new();
-
-        DialogueChoice newChoice = new DialogueChoice
+        return s switch
         {
-            Text = "New choice...",
-            NextNode = to.Id
+            Speaker.Left => new Color(0.35f, 0.45f, 0.85f),
+            Speaker.Right => new Color(0.85f, 0.35f, 0.35f),
+            Speaker.Narrator => new Color(0.45f, 0.45f, 0.45f),
+            _ => Color.white
         };
-
-        from.Choices.Add(newChoice);
-        from.NextNode = -1;
     }
 
-    private bool IsMouseOverConnection(Vector2 start, Vector2 end)
-    {
-        float distance = HandleUtility.DistancePointBezier(
-            (Event.current.mousePosition - panOffset) / zoom,
-            start,
-            end,
-            start + Vector2.right * 80,
-            end + Vector2.left * 80
-        );
-
-        return distance < 10f;
-    }
-
-    private void HandlePanAndZoom()
+    #endregion
+    
+    void HandleContextMenu()
     {
         Event e = Event.current;
 
-        if (e.type == EventType.ScrollWheel)
+        if (e.type == EventType.MouseDown && e.button == 1)
         {
-            float zoomDelta = -e.delta.y * 0.03f;
-            zoom = Mathf.Clamp(zoom + zoomDelta, ZoomMin, ZoomMax);
+            Vector2 graphPos = ScreenToGraph(e.mousePosition);
+
+            GenericMenu menu = new GenericMenu();
+
+            menu.AddItem(new GUIContent("Create Node"), false, () =>
+            {
+                DialogueNode n = new DialogueNode
+                {
+                    Id = dialogueData.Nodes.Count,
+                    Text = "New dialogue...",
+                    Speaker = Speaker.Narrator,
+                    EditorPosition = graphPos
+                };
+
+                dialogueData.Nodes.Add(n);
+                EditorUtility.SetDirty(dialogueData);
+            });
+
+            menu.ShowAsContext();
             e.Use();
         }
-
-        if (e.type == EventType.MouseDrag && e.button == 2)
-        {
-            panOffset += e.delta;
-            e.Use();
-        }
     }
 
-    private float GetNodeHeight(DialogueNode node)
-    {
-        int choiceCount = node.Choices != null
-            ? node.Choices.Count
-            : 0;
-
-        return 160 + choiceCount * 40 + 30;
-    }
-
-    private Color GetSpeakerColor(Speaker speaker)
-    {
-        switch (speaker)
-        {
-            case Speaker.Left:
-                return new Color(0.35f, 0.45f, 0.8f);
-
-            case Speaker.Right:
-                return new Color(0.8f, 0.35f, 0.35f);
-
-            case Speaker.Narrator:
-                return new Color(0.5f, 0.5f, 0.5f);
-
-            default:
-                return Color.white;
-        }
-    }
 }
