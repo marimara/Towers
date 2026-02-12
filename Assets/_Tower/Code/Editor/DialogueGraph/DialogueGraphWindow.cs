@@ -24,6 +24,9 @@ public class DialogueGraphWindow : EditorWindow
 
     void ConstructGraphView()
     {
+        if (graphView != null)
+            rootVisualElement.Remove(graphView);
+
         graphView = new DialogueGraphView();
         graphView.StretchToParentSize();
         rootVisualElement.Add(graphView);

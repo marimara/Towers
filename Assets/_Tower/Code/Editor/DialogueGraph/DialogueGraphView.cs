@@ -1,15 +1,14 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 
 public class DialogueGraphView : GraphView
 {
-    DialogueData currentData;
-    
+    private DialogueData currentData;
+
     public DialogueGraphView()
     {
         style.flexGrow = 1;
@@ -23,28 +22,40 @@ public class DialogueGraphView : GraphView
         var grid = new GridBackground();
         Insert(0, grid);
         grid.StretchToParentSize();
-        
-        var styleSheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(
-            "Assets/_Tower/Code/Editor/DialogueGraph/DialogueGraphStyle.uss");
 
-        if (styleSheet != null)
-            styleSheets.Add(styleSheet);
-        
         graphViewChanged = OnGraphChanged;
+
+        RegisterCallback<KeyDownEvent>(evt =>
+        {
+            if (evt.keyCode == KeyCode.Delete || evt.keyCode == KeyCode.Backspace)
+            {
+                DeleteSelection();
+                evt.StopPropagation();
+            }
+        });
     }
-    
+
+    // =========================
+    // SALVAR CONEXÕES
+    // =========================
+
     private GraphViewChange OnGraphChanged(GraphViewChange change)
     {
         if (currentData == null)
             return change;
 
+        // EDGE CRIADA
         if (change.edgesToCreate != null)
         {
             foreach (var edge in change.edgesToCreate)
             {
                 var fromView = edge.output.node as DialogueNodeView;
+                var toView = edge.input.node as DialogueNodeView;
+
+                if (fromView == null || toView == null)
+                    continue;
+
                 var fromNode = fromView.NodeData;
-                var toNode = (edge.input.node as DialogueNodeView).NodeData;
 
                 int portIndex = fromView.ChoiceOutputs.IndexOf(edge.output);
 
@@ -55,38 +66,86 @@ public class DialogueGraphView : GraphView
                     fromNode.Choices = new List<DialogueChoice>();
 
                 while (fromNode.Choices.Count <= portIndex)
-                {
                     fromNode.Choices.Add(new DialogueChoice { NextNode = -1 });
-                }
 
-                fromNode.Choices[portIndex].NextNode = toNode.Id;
+                fromNode.Choices[portIndex].NextNode = toView.NodeData.Id;
 
                 EditorUtility.SetDirty(currentData);
-
             }
         }
 
+        // EDGE REMOVIDA
         if (change.elementsToRemove != null)
         {
             foreach (var element in change.elementsToRemove)
             {
                 if (element is Edge edge)
                 {
-                    var fromNode = (edge.output.node as DialogueNodeView).NodeData;
-                    var toNode = (edge.input.node as DialogueNodeView).NodeData;
+                    var fromView = edge.output.node as DialogueNodeView;
+                    var toView = edge.input.node as DialogueNodeView;
+
+                    if (fromView == null || toView == null)
+                        continue;
+
+                    var fromNode = fromView.NodeData;
 
                     if (fromNode.Choices != null)
                     {
-                        fromNode.Choices.RemoveAll(c => c.NextNode == toNode.Id);
+                        fromNode.Choices.RemoveAll(c => c.NextNode == toView.NodeData.Id);
                         EditorUtility.SetDirty(currentData);
                     }
+                }
+
+                // NODE REMOVIDO
+                if (element is DialogueNodeView nodeView)
+                {
+                    currentData.Nodes.Remove(nodeView.NodeData);
+                    EditorUtility.SetDirty(currentData);
                 }
             }
         }
 
         return change;
     }
-    
+
+    // =========================
+    // DELETE PERSONALIZADO
+    // =========================
+
+    public override EventPropagation DeleteSelection()
+    {
+        if (currentData == null)
+            return base.DeleteSelection();
+
+        foreach (var element in selection.ToList())
+        {
+            if (element is DialogueNodeView nodeView)
+            {
+                currentData.Nodes.Remove(nodeView.NodeData);
+            }
+
+            if (element is Edge edge)
+            {
+                var fromView = edge.output.node as DialogueNodeView;
+                var toView = edge.input.node as DialogueNodeView;
+
+                if (fromView != null && fromView.NodeData.Choices != null)
+                {
+                    fromView.NodeData.Choices
+                        .RemoveAll(c => c.NextNode == toView.NodeData.Id);
+                }
+            }
+        }
+
+        EditorUtility.SetDirty(currentData);
+
+        return base.DeleteSelection();
+    }
+
+    // =========================
+    // CRIAR NODE
+    // =========================
+
     public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
     {
         evt.menu.AppendAction("Create Dialogue Node", _ =>
@@ -94,7 +153,7 @@ public class DialogueGraphView : GraphView
             if (currentData == null)
                 return;
 
-            DialogueNode dataNode = new DialogueNode
+            var node = new DialogueNode
             {
                 Id = currentData.Nodes.Count,
                 Text = "New dialogue...",
@@ -102,31 +161,26 @@ public class DialogueGraphView : GraphView
                 EditorPosition = evt.localMousePosition
             };
 
-            currentData.Nodes.Add(dataNode);
+            currentData.Nodes.Add(node);
             EditorUtility.SetDirty(currentData);
 
-            var view = CreateNodeView(dataNode);
-            AddElement(view);
+            AddElement(CreateNodeView(node));
         });
     }
 
-    
     public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter adapter)
     {
-        var compatible = new List<Port>();
-
-        ports.ForEach(port =>
-        {
-            if (startPort != port &&
-                startPort.node != port.node &&
-                startPort.direction != port.direction)
-            {
-                compatible.Add(port);
-            }
-        });
-
-        return compatible;
+        return ports.ToList().Where(port =>
+            startPort != port &&
+            startPort.node != port.node &&
+            startPort.direction != port.direction
+        ).ToList();
     }
+
+    // =========================
+    // LOAD
+    // =========================
+
     public void LoadData(DialogueData data)
     {
         currentData = data;
@@ -137,45 +191,39 @@ public class DialogueGraphView : GraphView
             return;
 
         foreach (var node in data.Nodes)
-        {
-            var nodeView = CreateNodeView(node);
-            AddElement(nodeView);
-        }
-        foreach (var nodeView in nodes.ToList())
-        {
-            var fromView = nodeView as DialogueNodeView;
-            if (fromView == null) continue;
+            AddElement(CreateNodeView(node));
 
-            if (fromView.NodeData.Choices == null) continue;
+        foreach (var view in nodes.OfType<DialogueNodeView>())
+        {
+            if (view.NodeData.Choices == null)
+                continue;
 
-            foreach (var choice in fromView.NodeData.Choices)
+            foreach (var choice in view.NodeData.Choices)
             {
-                var targetView = nodes
+                var target = nodes
                     .OfType<DialogueNodeView>()
                     .FirstOrDefault(n => n.NodeData.Id == choice.NextNode);
 
-                if (targetView == null) continue;
-
-                int index = fromView.NodeData.Choices.IndexOf(choice);
-
-                if (index < 0 || index >= fromView.ChoiceOutputs.Count)
+                if (target == null)
                     continue;
 
-                var port = fromView.ChoiceOutputs[index];
+                int index = view.NodeData.Choices.IndexOf(choice);
 
-                var edge = port.ConnectTo(targetView.Input);
+                if (index < 0 || index >= view.ChoiceOutputs.Count)
+                    continue;
+
+                var port = view.ChoiceOutputs[index];
+                var edge = port.ConnectTo(target.Input);
+
                 AddElement(edge);
-
             }
         }
-
     }
-    DialogueNodeView CreateNodeView(DialogueNode node)
+
+    private DialogueNodeView CreateNodeView(DialogueNode node)
     {
-        var view = new DialogueNodeView(node);
+        var view = new DialogueNodeView(node, currentData);
         view.SetPosition(new Rect(node.EditorPosition, new Vector2(250, 180)));
         return view;
     }
-
-
 }
