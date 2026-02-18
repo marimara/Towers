@@ -1,150 +1,310 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
-using System.Collections.Generic;
-using UnityEditor;
 
+/// <summary>
+/// Visual representation of a single <see cref="DialogueNode"/> in the GraphView.
+///
+/// Port model (fixed vs. original):
+///   InputPort        — Multi-capacity input; one per node; never changes.
+///   NextOutputPort   — Single-capacity output for linear flow; hidden when choices exist.
+///   ChoiceOutputPorts — One port per DialogueChoice; managed by RebuildChoicePorts().
+///
+/// Save strategy: mutations call ScheduleSave() which defers SetDirty to the next
+/// editor frame via EditorApplication.delayCall. AssetDatabase.SaveAssets() is NOT
+/// called here — only from DialogueGraphWindow (toolbar button / OnDisable).
+/// </summary>
 public class DialogueNodeView : Node
 {
-    public DialogueNode NodeData;
-    DialogueData ownerData;
+    // -------------------------------------------------------------------------
+    // Public fields read by DialogueGraphView
+    // -------------------------------------------------------------------------
 
-    public Port Input;
-    public List<Port> ChoiceOutputs = new();
+    public DialogueNode NodeData { get; private set; }
 
-    VisualElement choicesContainer;
+    /// <summary>The single input port (accepts connections from any output).</summary>
+    public Port InputPort { get; private set; }
+
+    /// <summary>Output port for linear flow. Null GUID = end-of-dialogue. Hidden when choices exist.</summary>
+    public Port NextOutputPort { get; private set; }
+
+    /// <summary>One port per NodeData.Choices entry. Index is stable within a RebuildChoicePorts() call.</summary>
+    public List<Port> ChoiceOutputPorts { get; private set; } = new();
+
+    // -------------------------------------------------------------------------
+    // Private state
+    // -------------------------------------------------------------------------
+
+    private readonly DialogueData _ownerData;
+    private VisualElement _choicesSection;
+    private bool _savePending;
+
+    // -------------------------------------------------------------------------
+    // Constructor
+    // -------------------------------------------------------------------------
 
     public DialogueNodeView(DialogueNode node, DialogueData data)
     {
-        NodeData = node;
-        ownerData = data;
+        NodeData    = node;
+        _ownerData  = data;
 
         AddToClassList("dialogue-node");
 
-        Input = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
-        Input.portName = "";
-        inputContainer.Add(Input);
+        // --- Input port (never removed) ---
+        InputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
+        InputPort.portName = "";
+        inputContainer.Add(InputPort);
 
-        var nextPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
-        nextPort.portName = "Next";
-        outputContainer.Add(nextPort);
-        ChoiceOutputs.Add(nextPort);
+        // --- Linear Next output port (hidden when choices exist) ---
+        NextOutputPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
+        NextOutputPort.portName = "Next";
+        outputContainer.Add(NextOutputPort);
 
+        // --- Speaker dropdown ---
         var speakerField = new EnumField(node.Speaker);
         speakerField.RegisterValueChangedCallback(e =>
         {
+            Undo.RecordObject(_ownerData, "Change Speaker");
             NodeData.Speaker = (Speaker)e.newValue;
             UpdateSpeakerStyle();
-            Save();
+            UpdateNodeTypeClasses();
+            ScheduleSave();
         });
         mainContainer.Add(speakerField);
 
-        var textField = new TextField { multiline = true, value = node.Text };
-        title = Shorten(node.Text);
+        // --- Display name field ---
+        var nameField = new TextField { value = node.DisplayName, tooltip = "Node display name" };
+        nameField.RegisterValueChangedCallback(e =>
+        {
+            Undo.RecordObject(_ownerData, "Rename Dialogue Node");
+            NodeData.DisplayName = e.newValue;
+            title = string.IsNullOrEmpty(e.newValue) ? Shorten(NodeData.Text) : e.newValue;
+            ScheduleSave();
+        });
+        mainContainer.Add(nameField);
 
+        // --- Dialogue text field ---
+        var textField = new TextField { multiline = true, value = node.Text };
+        title = string.IsNullOrEmpty(node.DisplayName) ? Shorten(node.Text) : node.DisplayName;
         textField.RegisterValueChangedCallback(e =>
         {
+            Undo.RecordObject(_ownerData, "Edit Dialogue Text");
             NodeData.Text = e.newValue;
-            title = Shorten(NodeData.Text);
-            Save();
+            if (string.IsNullOrEmpty(NodeData.DisplayName))
+                title = Shorten(e.newValue);
+            ScheduleSave();
         });
-
         mainContainer.Add(textField);
 
-        choicesContainer = new VisualElement();
-        choicesContainer.style.marginTop = 6;
-        choicesContainer.style.backgroundColor = new Color(.08f,.08f,.08f);
-        mainContainer.Add(choicesContainer);
+        // --- Choices section ---
+        _choicesSection = new VisualElement();
+        _choicesSection.style.marginTop = 6;
+        _choicesSection.style.backgroundColor = new Color(.08f, .08f, .08f);
+        mainContainer.Add(_choicesSection);
 
-        var addBtn = new Button(AddChoice) { text = "+ Add Choice" };
-        mainContainer.Add(addBtn);
+        var addChoiceBtn = new Button(AddChoice) { text = "+ Add Choice" };
+        mainContainer.Add(addChoiceBtn);
 
-        DrawChoices();
+        // --- Initial build ---
+        RebuildChoicePorts();
         UpdateSpeakerStyle();
+        UpdateNodeTypeClasses();
 
         RefreshExpandedState();
         RefreshPorts();
     }
 
-    void AddChoice()
+    // -------------------------------------------------------------------------
+    // Context menu — "Set as Start Node"
+    // -------------------------------------------------------------------------
+
+    public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
     {
-        NodeData.Choices ??= new List<DialogueChoice>();
-
-        NodeData.Choices.Add(new DialogueChoice
+        base.BuildContextualMenu(evt);
+        evt.menu.AppendSeparator();
+        evt.menu.AppendAction("Set as Start Node", _ =>
         {
-            Text = "New choice...",
-            NextNode = -1
-        });
+            Undo.RecordObject(_ownerData, "Set Start Node");
+            _ownerData.StartNodeGuid = NodeData.Guid;
+            EditorUtility.SetDirty(_ownerData);
 
-        Save();
-        DrawChoices();
+            // Notify the parent graph view to refresh start-node indicator visuals
+            GetFirstAncestorOfType<DialogueGraphView>()?.RefreshStartNodeIndicators();
+        });
     }
 
-    void DrawChoices()
+    // -------------------------------------------------------------------------
+    // Port management
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Fully rebuilds the choice output ports from NodeData.Choices.
+    /// Disconnects and removes old ports before creating new ones to avoid ghost connections.
+    /// </summary>
+    public void RebuildChoicePorts()
     {
-        choicesContainer.Clear();
-        ChoiceOutputs.Clear();
+        // 1. Disconnect and remove all existing choice ports
+        foreach (var port in ChoiceOutputPorts)
+        {
+            // Disconnect each edge on this port before removing the port itself
+            foreach (var edge in port.connections.ToList())
+            {
+                edge.input?.Disconnect(edge);
+                edge.output?.Disconnect(edge);
+                edge.parent?.Remove(edge);
+            }
+            outputContainer.Remove(port);
+        }
+        ChoiceOutputPorts.Clear();
+        _choicesSection.Clear();
 
-        if (NodeData.Choices == null) return;
+        bool hasChoices = NodeData.Choices != null && NodeData.Choices.Count > 0;
 
+        // Show/hide the linear Next port based on whether choices exist
+        NextOutputPort.style.display = hasChoices ? DisplayStyle.None : DisplayStyle.Flex;
+
+        if (!hasChoices)
+        {
+            RefreshExpandedState();
+            RefreshPorts();
+            return;
+        }
+
+        // 2. Create one row + port per choice
         foreach (var choice in NodeData.Choices)
         {
-            var row = new VisualElement { style = { flexDirection = FlexDirection.Row } };
+            var choiceRef = choice; // capture for closures
 
-            var text = new TextField { value = choice.Text };
-            text.style.flexGrow = 1;
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.style.alignItems    = Align.Center;
 
-            text.RegisterValueChangedCallback(e =>
+            // Delete button for this choice
+            var deleteBtn = new Button(() => RemoveChoice(choiceRef)) { text = "✕" };
+            deleteBtn.style.width      = 20;
+            deleteBtn.style.marginRight = 4;
+
+            // Choice text field
+            var textField = new TextField { value = choice.Text };
+            textField.style.flexGrow = 1;
+            textField.RegisterValueChangedCallback(e =>
             {
-                choice.Text = e.newValue;
-                Save();
+                Undo.RecordObject(_ownerData, "Edit Choice Text");
+                choiceRef.Text = e.newValue;
+                ScheduleSave();
             });
 
+            // Output port for this choice
             var port = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
             port.portName = "";
 
-            row.Add(text);
+            row.Add(deleteBtn);
+            row.Add(textField);
             row.Add(port);
 
-            choicesContainer.Add(row);
-            ChoiceOutputs.Add(port);
+            _choicesSection.Add(row);
+            outputContainer.Add(port);
+            ChoiceOutputPorts.Add(port);
         }
 
+        RefreshExpandedState();
         RefreshPorts();
     }
 
-    void UpdateSpeakerStyle()
-    {
-        Color col = NodeData.Speaker switch
-        {
-            Speaker.Left => new(.25f,.45f,1f),
-            Speaker.Right => new(1f,.3f,.3f),
-            Speaker.Narrator => new(.75f,.75f,.75f),
-            _ => Color.gray
-        };
+    // -------------------------------------------------------------------------
+    // Choice management
+    // -------------------------------------------------------------------------
 
-        var ui = new StyleColor(col);
-        titleContainer.style.backgroundColor = ui;
-        style.borderLeftColor = ui;
-        style.borderRightColor = ui;
-        style.borderTopColor = ui;
-        style.borderBottomColor = ui;
+    private void AddChoice()
+    {
+        Undo.RecordObject(_ownerData, "Add Dialogue Choice");
+        NodeData.Choices ??= new List<DialogueChoice>();
+        NodeData.Choices.Add(new DialogueChoice { Text = "New choice...", NextNodeGuid = null });
+        ScheduleSave();
+        RebuildChoicePorts();
+        UpdateNodeTypeClasses();
     }
+
+    private void RemoveChoice(DialogueChoice choice)
+    {
+        Undo.RecordObject(_ownerData, "Remove Dialogue Choice");
+        NodeData.Choices.Remove(choice);
+        ScheduleSave();
+        RebuildChoicePorts();
+        UpdateNodeTypeClasses();
+    }
+
+    // -------------------------------------------------------------------------
+    // Position persistence (editor-layout asset, not runtime data)
+    // -------------------------------------------------------------------------
 
     public override void SetPosition(Rect newPos)
     {
         base.SetPosition(newPos);
-        NodeData.EditorPosition = newPos.position;
-        Save();
+        // Position is written to the companion DialogueNodeEditorData by the graph view
+        // when it calls view.SetPosition(). The view passes editorData.SetPosition() directly.
     }
 
-    void Save()
+    // -------------------------------------------------------------------------
+    // Styling
+    // -------------------------------------------------------------------------
+
+    private void UpdateSpeakerStyle()
     {
-        EditorUtility.SetDirty(ownerData);
-        AssetDatabase.SaveAssets();
+        Color col = NodeData.Speaker switch
+        {
+            Speaker.Left     => new Color(.25f, .45f, 1f),
+            Speaker.Right    => new Color(1f,   .3f,  .3f),
+            Speaker.Narrator => new Color(.75f, .75f, .75f),
+            _                => Color.gray
+        };
+
+        var styleColor = new StyleColor(col);
+        titleContainer.style.backgroundColor = styleColor;
+        style.borderLeftColor   = styleColor;
+        style.borderRightColor  = styleColor;
+        style.borderTopColor    = styleColor;
+        style.borderBottomColor = styleColor;
     }
 
-    string Shorten(string text)
+    private void UpdateNodeTypeClasses()
+    {
+        EnableInClassList("node-linear",    NodeData.IsLinear);
+        EnableInClassList("node-branching", !NodeData.IsLinear);
+    }
+
+    /// <summary>Visually marks this node as the conversation start point.</summary>
+    public void SetStartNodeIndicator(bool isStart)
+    {
+        EnableInClassList("start-node", isStart);
+    }
+
+    // -------------------------------------------------------------------------
+    // Deferred save (no SaveAssets on every keystroke)
+    // -------------------------------------------------------------------------
+
+    private void ScheduleSave()
+    {
+        if (_savePending) return;
+        _savePending = true;
+        EditorApplication.delayCall += ExecuteSave;
+    }
+
+    private void ExecuteSave()
+    {
+        _savePending = false;
+        if (_ownerData != null)
+            EditorUtility.SetDirty(_ownerData);
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private static string Shorten(string text)
     {
         if (string.IsNullOrEmpty(text)) return "Dialogue";
         return text.Length > 30 ? text[..30] + "..." : text;

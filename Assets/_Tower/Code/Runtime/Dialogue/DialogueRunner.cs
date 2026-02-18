@@ -1,120 +1,174 @@
+using System;
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Collections.Generic;
 
+/// <summary>
+/// Orchestrates dialogue flow. Pure coordinator — no UI code lives here.
+/// All presentation is delegated to an <see cref="IDialoguePresenter"/>.
+///
+/// Key changes from the original:
+///  - GUID-based node lookup (O(1) dictionary) instead of list-index access.
+///  - StartDialogue accepts an optional startNodeGuid; falls back to DialogueData.StartNodeGuid.
+///  - public OnDialogueEnd event lets callers react without coupling.
+///  - Awake() validates all required references with descriptive errors.
+///  - No UI code — VNDialoguePresenter owns all TMP_Text / Button refs.
+/// </summary>
 public class DialogueRunner : MonoBehaviour
 {
+    // -------------------------------------------------------------------------
+    // Inspector
+    // -------------------------------------------------------------------------
+
     [Header("Data")]
-    public DialogueData dialogueData;
+    [SerializeField] private DialogueData _dialogueData;
 
-    private int currentNodeId;
+    [Header("Presenter")]
+    [Tooltip("Assign a MonoBehaviour that implements IDialoguePresenter (e.g. VNDialoguePresenter).")]
+    [SerializeField] private VNDialoguePresenter _presenter;
 
-    [Header("UI References")]
+    [Header("Config")]
+    [SerializeField] private SpeakerConfig _speakerConfig;
 
-    public GameObject justDialogue;
-    public GameObject dialogueWithChoices;
+    // -------------------------------------------------------------------------
+    // Events
+    // -------------------------------------------------------------------------
 
-    public TMP_Text dialogueTextSimple;
-    public TMP_Text dialogueTextChoices;
+    /// <summary>Fired when the dialogue sequence reaches a terminal node (null or missing NextNodeGuid).</summary>
+    public event Action<DialogueData> OnDialogueEnd;
 
-    public TMP_Text nameTextSimple;
-    public TMP_Text nameTextChoices;
+    // -------------------------------------------------------------------------
+    // Private state
+    // -------------------------------------------------------------------------
 
-    public Transform choicesContainer;
-    public Button choiceButtonPrefab;
+    private DialogueNode _currentNode;
+    private bool _initialized;
 
-    public Button continueButton;
+    // -------------------------------------------------------------------------
+    // Unity lifecycle
+    // -------------------------------------------------------------------------
 
-    [Header("Actors")]
-    public GameObject leftActor;
-    public GameObject rightActor;
-
-    void Start()
+    private void Awake()
     {
-        StartDialogue(0);
+        _initialized = ValidateReferences();
     }
 
-    public void StartDialogue(int startNode)
+    private void Start()
     {
-        currentNodeId = startNode;
-        ShowNode();
+        if (_initialized && _dialogueData != null)
+            StartDialogue(_dialogueData);
     }
 
-    void ShowNode()
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Begin a dialogue sequence.
+    /// Optionally specify a startNodeGuid to override the asset's default start node.
+    /// </summary>
+    public void StartDialogue(DialogueData data, string startNodeGuid = null)
     {
-        DialogueNode node = dialogueData.Nodes[currentNodeId];
-
-        UpdateActors(node.Speaker);
-
-        bool hasChoices = node.Choices != null && node.Choices.Count > 0;
-
-        justDialogue.SetActive(!hasChoices);
-        dialogueWithChoices.SetActive(hasChoices);
-
-        if (hasChoices)
+        if (!_initialized)
         {
-            dialogueTextChoices.text = node.Text;
-            nameTextChoices.text = node.Speaker.ToString();
-            BuildChoices(node.Choices);
-        }
-        else
-        {
-            dialogueTextSimple.text = node.Text;
-            nameTextSimple.text = node.Speaker.ToString();
-
-            continueButton.onClick.RemoveAllListeners();
-            continueButton.onClick.AddListener(() =>
-            {
-                GoToNode(node.NextNode);
-            });
-        }
-    }
-
-    void BuildChoices(List<DialogueChoice> choices)
-    {
-        foreach (Transform child in choicesContainer)
-            Destroy(child.gameObject);
-
-        foreach (var choice in choices)
-        {
-            Button btn = Instantiate(choiceButtonPrefab, choicesContainer);
-            btn.GetComponentInChildren<TMP_Text>().text = choice.Text;
-
-            int next = choice.NextNode;
-            btn.onClick.AddListener(() => GoToNode(next));
-        }
-    }
-
-    void GoToNode(int nextNode)
-    {
-        if (nextNode < 0 || nextNode >= dialogueData.Nodes.Count)
-        {
-            Debug.Log("Dialogue finished");
+            Debug.LogError($"[{name}] DialogueRunner cannot start — missing references.", this);
             return;
         }
 
-        currentNodeId = nextNode;
-        ShowNode();
+        if (data == null)
+        {
+            Debug.LogError($"[{name}] DialogueRunner.StartDialogue: data is null.", this);
+            return;
+        }
+
+        _dialogueData = data;
+        _dialogueData.BuildLookup();
+        gameObject.SetActive(true);
+
+        DialogueNode startNode;
+
+        if (!string.IsNullOrEmpty(startNodeGuid))
+        {
+            if (!_dialogueData.TryGetNode(startNodeGuid, out startNode))
+            {
+                Debug.LogError($"[{name}] Start node '{startNodeGuid}' not found in {data.name}. Falling back to asset default.", this);
+                startNode = _dialogueData.GetStartNode();
+            }
+        }
+        else
+        {
+            startNode = _dialogueData.GetStartNode();
+        }
+
+        if (startNode == null)
+        {
+            Debug.LogError($"[{name}] No start node found in {data.name}.", this);
+            return;
+        }
+
+        PresentNode(startNode);
     }
 
-    void UpdateActors(Speaker speaker)
+    // -------------------------------------------------------------------------
+    // Flow
+    // -------------------------------------------------------------------------
+
+    private void PresentNode(DialogueNode node)
     {
-        leftActor.SetActive(false);
-        rightActor.SetActive(false);
+        _currentNode = node;
 
-        switch (speaker)
+        _presenter.PresentNode(node, _speakerConfig);
+
+        if (!node.IsLinear)
         {
-            case Speaker.Left:
-                leftActor.SetActive(true);
-                break;
-
-            case Speaker.Right:
-                rightActor.SetActive(true);
-                break;
-
-            case Speaker.Narrator:
-                break;
+            // Branching: show choices and let the presenter call back with a GUID
+            _presenter.ShowChoices(node.Choices, GoToNode);
         }
+        else
+        {
+            // Linear: hide choices and wire the continue button
+            _presenter.HideChoices();
+            _presenter.SetContinueAction(() => GoToNode(node.NextNodeGuid));
+        }
+    }
+
+    private void GoToNode(string guid)
+    {
+        if (string.IsNullOrEmpty(guid))
+        {
+            EndDialogue();
+            return;
+        }
+
+        if (!_dialogueData.TryGetNode(guid, out var node))
+        {
+            Debug.LogWarning($"[{name}] Node '{guid}' not found in {_dialogueData.name}. Ending dialogue.", this);
+            EndDialogue();
+            return;
+        }
+
+        PresentNode(node);
+    }
+
+    private void EndDialogue()
+    {
+        _presenter.OnDialogueEnd();
+        OnDialogueEnd?.Invoke(_dialogueData);
+    }
+
+    // -------------------------------------------------------------------------
+    // Validation
+    // -------------------------------------------------------------------------
+
+    private bool ValidateReferences()
+    {
+        bool ok = true;
+
+        if (_presenter == null)
+        {
+            Debug.LogError($"[{name}] DialogueRunner._presenter is not assigned. Assign a VNDialoguePresenter.", this);
+            ok = false;
+        }
+
+        // _dialogueData and _speakerConfig are optional at Awake — StartDialogue() validates data
+        return ok;
     }
 }

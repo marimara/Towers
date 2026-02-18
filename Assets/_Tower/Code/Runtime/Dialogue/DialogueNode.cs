@@ -2,29 +2,69 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+/// <summary>
+/// A single node in a dialogue graph.
+/// Identified by a stable GUID so references survive deletion and reordering.
+/// EditorPosition is no longer stored here — see DialogueNodeEditorData (Editor only).
+/// </summary>
 [System.Serializable]
 public class DialogueNode
 {
-    [HorizontalGroup("Row", Width = 80)]
-    [LabelText("ID")]
-    public int Id;
+    // -------------------------------------------------------------------------
+    // Identity
+    // -------------------------------------------------------------------------
 
-    [HorizontalGroup("Row", Width = 120)]
+    /// <summary>Stable unique identifier. Assigned once at creation, never changed.</summary>
+    [ReadOnly, HorizontalGroup("Header", Width = 230)]
+    [LabelText("GUID")]
+    public string Guid;
+
+    /// <summary>Human-readable label shown in the graph node title and Odin TableList.</summary>
+    [HorizontalGroup("Header")]
+    [LabelText("Name")]
+    public string DisplayName;
+
+    // -------------------------------------------------------------------------
+    // Content
+    // -------------------------------------------------------------------------
+
+    [HorizontalGroup("Content", Width = 120)]
+    [LabelText("Speaker")]
     public Speaker Speaker;
 
-    [TextArea(3, 6)]
+    [TextArea(3, 6), HideLabel]
     public string Text;
 
+    // -------------------------------------------------------------------------
+    // Branching
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Choices presented to the player when this node is active.
+    /// When non-empty, <see cref="NextNodeGuid"/> is ignored.
+    /// </summary>
     [ListDrawerSettings(Expanded = true)]
     public List<DialogueChoice> Choices = new();
 
+    /// <summary>
+    /// GUID of the next node for linear (no-choice) flow.
+    /// Null or empty signals end-of-dialogue.
+    /// Active only when <see cref="Choices"/> is empty.
+    /// </summary>
     [ShowIf(nameof(HasNoChoices))]
-    public int NextNode;
+    [LabelText("Next Node GUID")]
+    public string NextNodeGuid;
 
-    [field: SerializeField] public Vector2 EditorPosition { get; set; } = new Vector2(100, 100);
+    // -------------------------------------------------------------------------
+    // Phase 5 hooks — uncomment when conditions/commands are implemented
+    // -------------------------------------------------------------------------
+    // public List<string> CommandIds = new();
 
-    private bool HasNoChoices()
-    {
-        return Choices == null || Choices.Count == 0;
-    }
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    public bool IsLinear => Choices == null || Choices.Count == 0;
+
+    private bool HasNoChoices() => IsLinear;
 }

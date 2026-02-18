@@ -1,19 +1,48 @@
+/* ============================================================
+   Dialogue Graph — USS Stylesheet
+   ============================================================ */
+
+/* Base node */
 .dialogue-node {
     background-color: #1b1b1b;
-    border-radius: 12px;
-    border: 2px solid #444;
+    border-radius: 8px;
+    border-width: 2px;
+    border-color: #444;
 }
 
-.dialogue-node .title {
-    background-color: #252525;
-    padding: 6px;
-    font-weight: bold;
+.dialogue-node .unity-node__title {
+    padding: 6px 8px;
+    font-size: 13px;
+    -unity-font-style: bold;
 }
 
-.dialogue-node.left { border-color: #3a6cff; }
-.dialogue-node.right { border-color: #ff4a4a; }
+/* ── Speaker colours applied inline from DialogueNodeView ── */
+.dialogue-node.left   { border-color: #3a6cff; }
+.dialogue-node.right  { border-color: #ff4a4a; }
 .dialogue-node.narrator { border-color: #999; }
 
+/* ── Node type variants ── */
+.node-linear {
+    /* Subtle italic hint that this is a linear (pass-through) node */
+    opacity: 0.92;
+}
+
+.node-branching {
+    border-width: 3px;
+}
+
+/* ── Start-node indicator ── */
+.start-node {
+    border-color: #ffe566 !important;
+    border-width: 3px !important;
+}
+
+.start-node .unity-node__title::before {
+    content: "▶ ";
+    color: #ffe566;
+}
+
+/* ── Ports ── */
 .dialogue-port {
     width: 10px;
     height: 10px;
@@ -21,7 +50,18 @@
     border-radius: 50%;
 }
 
-TextField {
+/* ── Text fields inside nodes ── */
+.dialogue-node TextField {
     background-color: #101010;
     color: #ddd;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+/* ── Choices section ── */
+.dialogue-node .choices-section {
+    margin-top: 6px;
+    background-color: #0d0d0d;
+    border-radius: 4px;
+    padding: 2px;
 }
