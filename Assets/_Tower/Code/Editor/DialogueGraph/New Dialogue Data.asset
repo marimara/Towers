@@ -44,13 +44,13 @@ MonoBehaviour:
     Text: New dialogue...
     Choices: []
     NextNode: 0
-    <EditorPosition>k__BackingField: {x: 760, y: 238.66666}
+    <EditorPosition>k__BackingField: {x: 793.00006, y: 238.66667}
   - Id: 5
     Speaker: 2
     Text: New dialogue...
     Choices: []
     NextNode: 0
-    <EditorPosition>k__BackingField: {x: 706.3334, y: 430.66666}
+    <EditorPosition>k__BackingField: {x: 813.34845, y: 436.66666}
   - Id: 5
     Speaker: 2
     Text: eita porra
