@@ -126,11 +126,13 @@ public class DialogueGraphView : GraphView
                 Guid        = System.Guid.NewGuid().ToString(),
                 DisplayName = "",
                 Text        = "New dialogue...",
-                Speaker     = Speaker.Narrator
+                Speaker     = null
             };
 
             Undo.RecordObject(_currentData, "Create Dialogue Node");
             _currentData.Nodes.Add(node);
+            if (string.IsNullOrEmpty(_currentData.StartNodeGuid))
+                _currentData.StartNodeGuid = node.Guid;
             _currentData.InvalidateLookup();
             EditorUtility.SetDirty(_currentData);
 
@@ -190,8 +192,8 @@ public class DialogueGraphView : GraphView
                     case Edge edge:
                     {
                         var fromView = edge.output.node as DialogueNodeView;
-                        var toView   = edge.input.node  as DialogueNodeView;
-                        if (fromView == null || toView == null) break;
+                        if (fromView == null) break;
+                        // toView may be null when the target node is being deleted in the same batch
 
                         Undo.RecordObject(_currentData, "Disconnect Dialogue Node");
 
@@ -214,6 +216,8 @@ public class DialogueGraphView : GraphView
                     case DialogueNodeView nodeView:
                     {
                         Undo.RecordObject(_currentData, "Delete Dialogue Node");
+                        if (_currentData.StartNodeGuid == nodeView.NodeData.Guid)
+                            _currentData.StartNodeGuid = null;
                         _currentData.Nodes.Remove(nodeView.NodeData);
                         _currentData.InvalidateLookup();
                         _editorData?.RemoveNode(nodeView.NodeData.Guid);
@@ -268,8 +272,11 @@ public class DialogueGraphView : GraphView
 
         foreach (var view in viewsByGuid.Values)
         {
-            // Restore linear Next edge
-            if (!string.IsNullOrEmpty(view.NodeData.NextNodeGuid) &&
+            // Restore linear Next edge — only for nodes that are actually linear.
+            // Branching nodes may carry a stale NextNodeGuid from a previous linear state;
+            // restoring it would produce an invisible ghost edge.
+            if (view.NodeData.IsLinear &&
+                !string.IsNullOrEmpty(view.NodeData.NextNodeGuid) &&
                 viewsByGuid.TryGetValue(view.NodeData.NextNodeGuid, out var nextTarget))
             {
                 var edge = view.NextOutputPort.ConnectTo(nextTarget.InputPort);

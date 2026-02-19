@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 158eef4b91e3170488641c5dc332778a, type: 3}
+  m_Name: test_EditorLayout
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::DialogueNodeEditorData
+  Layouts:
+  - NodeGuid: 8cb05a85-82c8-4114-b261-12c3e41402c6
+    Position: {x: 55.333332, y: 108}
+  - NodeGuid: d17b700d-eaf7-4d16-ab03-13a346c290a5
+    Position: {x: 422, y: 37.333332}
+  - NodeGuid: 514b119c-0e83-46cd-bcca-40d976fbcdef
+    Position: {x: 422, y: 260.66666}
+  - NodeGuid: c9708f8b-5b0a-444d-8885-ad639f0a93f9
+    Position: {x: 756, y: 38.666668}
+  - NodeGuid: 77072486-8553-4ef1-87d5-86351eedc031
+    Position: {x: 766.6667, y: 260.66666}

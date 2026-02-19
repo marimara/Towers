@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2fe38ed7411c3b41805db5b94c10718, type: 3}
+  m_Name: test
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueData
+  StartNodeGuid: 8cb05a85-82c8-4114-b261-12c3e41402c6
+  LeftCharacter: {fileID: 0}
+  RightCharacter: {fileID: 0}
+  Nodes:
+  - Guid: 8cb05a85-82c8-4114-b261-12c3e41402c6
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+    Text: hey you there
+    Choices:
+    - Text: What
+      NextNodeGuid: d17b700d-eaf7-4d16-ab03-13a346c290a5
+    - Text: Me?
+      NextNodeGuid: 514b119c-0e83-46cd-bcca-40d976fbcdef
+    NextNodeGuid: 
+  - Guid: d17b700d-eaf7-4d16-ab03-13a346c290a5
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+    Text: Come here
+    Choices: []
+    NextNodeGuid: c9708f8b-5b0a-444d-8885-ad639f0a93f9
+  - Guid: 514b119c-0e83-46cd-bcca-40d976fbcdef
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+    Text: Who else would be?
+    Choices: []
+    NextNodeGuid: 77072486-8553-4ef1-87d5-86351eedc031
+  - Guid: c9708f8b-5b0a-444d-8885-ad639f0a93f9
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+    Text: I'm here what do you want?
+    Choices: []
+    NextNodeGuid: 
+  - Guid: 77072486-8553-4ef1-87d5-86351eedc031
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+    Text: I don't want to
+    Choices: []
+    NextNodeGuid: 

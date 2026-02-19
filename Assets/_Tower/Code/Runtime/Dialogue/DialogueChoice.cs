@@ -1,4 +1,5 @@
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 /// <summary>
 /// A single player choice branching from a <see cref="DialogueNode"/>.

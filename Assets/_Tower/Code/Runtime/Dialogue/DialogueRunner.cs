@@ -25,9 +25,6 @@ public class DialogueRunner : MonoBehaviour
     [Tooltip("Assign a MonoBehaviour that implements IDialoguePresenter (e.g. VNDialoguePresenter).")]
     [SerializeField] private VNDialoguePresenter _presenter;
 
-    [Header("Config")]
-    [SerializeField] private SpeakerConfig _speakerConfig;
-
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
@@ -115,7 +112,7 @@ public class DialogueRunner : MonoBehaviour
     {
         _currentNode = node;
 
-        _presenter.PresentNode(node, _speakerConfig);
+        _presenter.PresentNode(node, null);
 
         if (!node.IsLinear)
         {

@@ -43,6 +43,9 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
     private ChoiceButtonPool _buttonPool;
     private bool _initialized;
 
+    private VNCharacter _leftCharacter;
+    private VNCharacter _rightCharacter;
+
     // -------------------------------------------------------------------------
     // Unity lifecycle
     // -------------------------------------------------------------------------
@@ -62,16 +65,31 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
     {
         if (!_initialized) return;
 
-        string displayName = config != null
-            ? config.GetDisplayName(node.Speaker)
-            : node.Speaker.ToString();
+        string displayName = node.Speaker != null
+            ? node.Speaker.DisplayName
+            : "Unknown";
 
-        if (_linearNameText  != null) _linearNameText.text  = displayName;
-        if (_choicesNameText != null) _choicesNameText.text = displayName;
+        Color nameColor = node.Speaker != null
+            ? node.Speaker.NameColor
+            : Color.white;
+
+        if (_linearNameText != null)
+        {
+            _linearNameText.text = displayName;
+            _linearNameText.color = nameColor;
+        }
+        if (_choicesNameText != null)
+        {
+            _choicesNameText.text = displayName;
+            _choicesNameText.color = nameColor;
+        }
+
         if (_linearDialogueText  != null) _linearDialogueText.text  = node.Text;
         if (_choicesDialogueText != null) _choicesDialogueText.text = node.Text;
 
-        UpdateActors(node.Speaker, config);
+        AssignCharacterToSlot(node.Speaker);
+        UpdateActorVisuals();
+        UpdateActorHighlight(node.Speaker);
     }
 
     public void ShowChoices(List<DialogueChoice> choices, Action<string> onChosen)
@@ -80,6 +98,7 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
 
         _linearPanel?.SetActive(false);
         _choicesPanel?.SetActive(true);
+        _continueButton?.gameObject.SetActive(false);
         _buttonPool.Present(choices, onChosen);
     }
 
@@ -89,6 +108,11 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
 
         _choicesPanel?.SetActive(false);
         _linearPanel?.SetActive(true);
+        if (_continueButton != null)
+        {
+            _continueButton.gameObject.SetActive(true);
+            _continueButton.interactable = true;
+        }
     }
 
     public void OnDialogueEnd()
@@ -98,6 +122,8 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
         _buttonPool?.ReturnAll();
         _linearPanel?.SetActive(false);
         _choicesPanel?.SetActive(false);
+        _leftCharacter = null;
+        _rightCharacter = null;
         _leftActor?.SetActive(false);
         _rightActor?.SetActive(false);
         gameObject.SetActive(false);
@@ -119,13 +145,72 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
     }
 
     // -------------------------------------------------------------------------
-    // Actors
+    // Character staging
     // -------------------------------------------------------------------------
 
-    private void UpdateActors(Speaker speaker, SpeakerConfig config)
+    private void AssignCharacterToSlot(VNCharacter speaker)
     {
-        _leftActor?.SetActive(speaker == Speaker.Left);
-        _rightActor?.SetActive(speaker == Speaker.Right);
+        if (speaker == null) return;
+
+        // Already in left slot
+        if (_leftCharacter == speaker) return;
+
+        // Already in right slot
+        if (_rightCharacter == speaker) return;
+
+        // Free left slot
+        if (_leftCharacter == null)
+        {
+            _leftCharacter = speaker;
+            return;
+        }
+
+        // Free right slot
+        if (_rightCharacter == null)
+        {
+            _rightCharacter = speaker;
+            return;
+        }
+
+        // Both occupied → replace right
+        _rightCharacter = speaker;
+    }
+
+    private void UpdateActorVisuals()
+    {
+        SetActor(_leftActor, _leftCharacter);
+        SetActor(_rightActor, _rightCharacter);
+    }
+
+    private void UpdateActorHighlight(VNCharacter speaker)
+    {
+        SetActorAlpha(_leftActor, _leftCharacter == speaker ? 1f : 0.5f);
+        SetActorAlpha(_rightActor, _rightCharacter == speaker ? 1f : 0.5f);
+    }
+
+    private void SetActor(GameObject actor, VNCharacter character)
+    {
+        if (actor == null) return;
+
+        bool hasCharacter = character != null;
+        actor.SetActive(hasCharacter);
+
+        if (!hasCharacter) return;
+
+        var image = actor.GetComponent<Image>();
+        if (image != null && character.Portrait != null)
+            image.sprite = character.Portrait;
+    }
+
+    private void SetActorAlpha(GameObject actor, float alpha)
+    {
+        if (actor == null) return;
+
+        var canvasGroup = actor.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = actor.AddComponent<CanvasGroup>();
+
+        canvasGroup.alpha = alpha;
     }
 
     // -------------------------------------------------------------------------

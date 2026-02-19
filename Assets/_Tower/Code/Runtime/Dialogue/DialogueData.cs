@@ -17,6 +17,12 @@ public class DialogueData : ScriptableObject
     [LabelText("Start Node GUID")]
     public string StartNodeGuid;
 
+    [LabelText("Left Character")]
+    public VNCharacter LeftCharacter;
+
+    [LabelText("Right Character")]
+    public VNCharacter RightCharacter;
+
     [TableList(AlwaysExpanded = true)]
     public List<DialogueNode> Nodes = new();
 

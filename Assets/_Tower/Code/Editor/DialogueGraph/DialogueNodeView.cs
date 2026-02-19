@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -64,11 +65,11 @@ public class DialogueNodeView : Node
         outputContainer.Add(NextOutputPort);
 
         // --- Speaker dropdown ---
-        var speakerField = new EnumField(node.Speaker);
+        var speakerField = new ObjectField("Speaker") { objectType = typeof(VNCharacter), value = node.Speaker };
         speakerField.RegisterValueChangedCallback(e =>
         {
             Undo.RecordObject(_ownerData, "Change Speaker");
-            NodeData.Speaker = (Speaker)e.newValue;
+            NodeData.Speaker = (VNCharacter)e.newValue;
             UpdateSpeakerStyle();
             UpdateNodeTypeClasses();
             ScheduleSave();
@@ -163,6 +164,25 @@ public class DialogueNodeView : Node
 
         bool hasChoices = NodeData.Choices != null && NodeData.Choices.Count > 0;
 
+        // 2. When transitioning to branching, purge any live NextOutputPort edge
+        //    and clear the data field so RestoreEdges cannot re-create a ghost.
+        if (hasChoices)
+        {
+            var nextConnections = NextOutputPort.connections.ToList();
+            if (nextConnections.Count > 0 || !string.IsNullOrEmpty(NodeData.NextNodeGuid))
+            {
+                Undo.RecordObject(_ownerData, "Clear Linear Connection");
+                foreach (var edge in nextConnections)
+                {
+                    edge.input?.Disconnect(edge);
+                    edge.output?.Disconnect(edge);
+                    edge.parent?.Remove(edge);
+                }
+                NodeData.NextNodeGuid = null;
+                EditorUtility.SetDirty(_ownerData);
+            }
+        }
+
         // Show/hide the linear Next port based on whether choices exist
         NextOutputPort.style.display = hasChoices ? DisplayStyle.None : DisplayStyle.Flex;
 
@@ -173,7 +193,7 @@ public class DialogueNodeView : Node
             return;
         }
 
-        // 2. Create one row + port per choice
+        // 3. Create one row + port per choice
         foreach (var choice in NodeData.Choices)
         {
             var choiceRef = choice; // capture for closures
@@ -223,7 +243,8 @@ public class DialogueNodeView : Node
         Undo.RecordObject(_ownerData, "Add Dialogue Choice");
         NodeData.Choices ??= new List<DialogueChoice>();
         NodeData.Choices.Add(new DialogueChoice { Text = "New choice...", NextNodeGuid = null });
-        ScheduleSave();
+        EditorUtility.SetDirty(_ownerData); // immediate: structural mutation must not be deferred
+        ScheduleSave();                      // safety net for text-field callbacks in RebuildChoicePorts
         RebuildChoicePorts();
         UpdateNodeTypeClasses();
     }
@@ -232,7 +253,8 @@ public class DialogueNodeView : Node
     {
         Undo.RecordObject(_ownerData, "Remove Dialogue Choice");
         NodeData.Choices.Remove(choice);
-        ScheduleSave();
+        EditorUtility.SetDirty(_ownerData); // immediate: structural mutation must not be deferred
+        ScheduleSave();                      // safety net for text-field callbacks in RebuildChoicePorts
         RebuildChoicePorts();
         UpdateNodeTypeClasses();
     }
@@ -254,13 +276,9 @@ public class DialogueNodeView : Node
 
     private void UpdateSpeakerStyle()
     {
-        Color col = NodeData.Speaker switch
-        {
-            Speaker.Left     => new Color(.25f, .45f, 1f),
-            Speaker.Right    => new Color(1f,   .3f,  .3f),
-            Speaker.Narrator => new Color(.75f, .75f, .75f),
-            _                => Color.gray
-        };
+        Color col = NodeData.Speaker != null && NodeData.Speaker.NameColor != default
+            ? NodeData.Speaker.NameColor
+            : Color.gray;
 
         var styleColor = new StyleColor(col);
         titleContainer.style.backgroundColor = styleColor;

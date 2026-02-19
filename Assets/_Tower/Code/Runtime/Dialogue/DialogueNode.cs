@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// A single node in a dialogue graph.
@@ -30,7 +31,8 @@ public class DialogueNode
 
     [HorizontalGroup("Content", Width = 120)]
     [LabelText("Speaker")]
-    public Speaker Speaker;
+    [FormerlySerializedAs("ActorSide")]
+    public VNCharacter Speaker;
 
     [TextArea(3, 6), HideLabel]
     public string Text;

@@ -1280,6 +1280,76 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 851236260}
   m_CullTransparentMesh: 1
+--- !u!1 &1208981759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1208981761}
+  - component: {fileID: 1208981760}
+  - component: {fileID: 1208981762}
+  m_Layer: 0
+  m_Name: VN Dialogue Presenter
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1208981760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208981759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1158a43d264889647a7646f2f15f7bdb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VNDialoguePresenter
+  _linearPanel: {fileID: 1859057047}
+  _choicesPanel: {fileID: 1765802130}
+  _linearDialogueText: {fileID: 770564852}
+  _linearNameText: {fileID: 287166818}
+  _continueButton: {fileID: 1867838162}
+  _choicesDialogueText: {fileID: 851236262}
+  _choicesNameText: {fileID: 262157619}
+  _choicesContainer: {fileID: 1640451078}
+  _choiceButtonPrefab: {fileID: 9118121757130483062, guid: d9aab8e534aa2d645aa79af2b636bcd4, type: 3}
+  _leftActor: {fileID: 810832609}
+  _rightActor: {fileID: 533691019}
+--- !u!4 &1208981761
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208981759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.07309, y: 0.25115, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1208981762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1208981759}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 231be3abd77f14243894e186c47faacb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
+  _dialogueData: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
+  _presenter: {fileID: 1208981760}
 --- !u!1 &1437812854
 GameObject:
   m_ObjectHideFlags: 0
@@ -1552,9 +1622,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1867838161}
   - {fileID: 1859057048}
   - {fileID: 1765802131}
+  - {fileID: 1867838161}
   m_Father: {fileID: 1666354537}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1574,18 +1644,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 231be3abd77f14243894e186c47faacb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
-  dialogueData: {fileID: 11400000, guid: ada88d3e095fad6469b7596c6aed7b8a, type: 2}
-  justDialogue: {fileID: 1859057047}
-  dialogueWithChoices: {fileID: 1765802130}
-  dialogueTextSimple: {fileID: 770564852}
-  dialogueTextChoices: {fileID: 851236262}
-  nameTextSimple: {fileID: 287166818}
-  nameTextChoices: {fileID: 262157619}
-  choicesContainer: {fileID: 1640451078}
-  choiceButtonPrefab: {fileID: 9118121757130483062, guid: d9aab8e534aa2d645aa79af2b636bcd4, type: 3}
-  continueButton: {fileID: 1867838162}
-  leftActor: {fileID: 810832609}
-  rightActor: {fileID: 533691019}
+  _dialogueData: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
+  _presenter: {fileID: 1208981760}
 --- !u!1 &1765802130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1947,3 +2007,4 @@ SceneRoots:
   - {fileID: 441151045}
   - {fileID: 1666354537}
   - {fileID: 1437812857}
+  - {fileID: 1208981761}
