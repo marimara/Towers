@@ -15,4 +15,6 @@ public class VNCharacter : ScriptableObject
 
     [Tooltip("Color used for the character's name text.")]
     public Color NameColor = Color.white;
+
+    public Race Race;
 }

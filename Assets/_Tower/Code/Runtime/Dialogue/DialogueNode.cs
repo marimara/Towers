@@ -58,6 +58,16 @@ public class DialogueNode
     public string NextNodeGuid;
 
     // -------------------------------------------------------------------------
+    // Relationship changes
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Relationship changes applied when this node is presented.
+    /// </summary>
+    [ListDrawerSettings(Expanded = true)]
+    public List<RelationshipChange> RelationshipChanges = new();
+
+    // -------------------------------------------------------------------------
     // Phase 5 hooks — uncomment when conditions/commands are implemented
     // -------------------------------------------------------------------------
     // public List<string> CommandIds = new();

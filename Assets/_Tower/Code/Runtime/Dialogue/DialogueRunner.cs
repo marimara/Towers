@@ -25,6 +25,9 @@ public class DialogueRunner : MonoBehaviour
     [Tooltip("Assign a MonoBehaviour that implements IDialoguePresenter (e.g. VNDialoguePresenter).")]
     [SerializeField] private VNDialoguePresenter _presenter;
 
+    [Header("Relationships")]
+    [SerializeField] private RaceRelationshipMatrix _raceMatrix;
+
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
@@ -38,6 +41,7 @@ public class DialogueRunner : MonoBehaviour
 
     private DialogueNode _currentNode;
     private bool _initialized;
+    private RelationshipManager _relationshipManager;
 
     // -------------------------------------------------------------------------
     // Unity lifecycle
@@ -80,6 +84,11 @@ public class DialogueRunner : MonoBehaviour
         _dialogueData.BuildLookup();
         gameObject.SetActive(true);
 
+        // Initialize relationship manager
+        _relationshipManager = new RelationshipManager();
+        var allCharacters = CollectCharacters(data);
+        _relationshipManager.Initialize(allCharacters, _raceMatrix);
+
         DialogueNode startNode;
 
         if (!string.IsNullOrEmpty(startNodeGuid))
@@ -111,6 +120,16 @@ public class DialogueRunner : MonoBehaviour
     private void PresentNode(DialogueNode node)
     {
         _currentNode = node;
+
+        // Apply relationship changes
+        if (_relationshipManager != null && node.RelationshipChanges != null)
+        {
+            foreach (var change in node.RelationshipChanges)
+            {
+                if (change.From != null && change.To != null)
+                    _relationshipManager.Modify(change.From, change.To, change.Delta);
+            }
+        }
 
         _presenter.PresentNode(node, null);
 
@@ -165,7 +184,33 @@ public class DialogueRunner : MonoBehaviour
             ok = false;
         }
 
-        // _dialogueData and _speakerConfig are optional at Awake — StartDialogue() validates data
+        // _dialogueData and _raceMatrix are optional at Awake — StartDialogue() validates data
         return ok;
+    }
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    private System.Collections.Generic.List<VNCharacter> CollectCharacters(DialogueData data)
+    {
+        var characters = new System.Collections.Generic.HashSet<VNCharacter>();
+        
+        foreach (var node in data.Nodes)
+        {
+            if (node.Speaker != null)
+                characters.Add(node.Speaker);
+
+            if (node.RelationshipChanges != null)
+            {
+                foreach (var change in node.RelationshipChanges)
+                {
+                    if (change.From != null) characters.Add(change.From);
+                    if (change.To != null) characters.Add(change.To);
+                }
+            }
+        }
+
+        return new System.Collections.Generic.List<VNCharacter>(characters);
     }
 }

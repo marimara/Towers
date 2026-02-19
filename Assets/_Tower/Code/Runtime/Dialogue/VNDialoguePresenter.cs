@@ -184,8 +184,8 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
 
     private void UpdateActorHighlight(VNCharacter speaker)
     {
-        SetActorAlpha(_leftActor, _leftCharacter == speaker ? 1f : 0.5f);
-        SetActorAlpha(_rightActor, _rightCharacter == speaker ? 1f : 0.5f);
+        SetActorAlpha(_leftActor, _leftCharacter == speaker ? 1f : 0.75f);
+        SetActorAlpha(_rightActor, _rightCharacter == speaker ? 1f : 0.75f);
     }
 
     private void SetActor(GameObject actor, VNCharacter character)
