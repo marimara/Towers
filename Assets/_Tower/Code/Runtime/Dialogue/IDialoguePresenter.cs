@@ -18,9 +18,9 @@ public interface IDialoguePresenter
 
     /// <summary>
     /// Show the choice buttons for a branching node.
-    /// <paramref name="onChosen"/> is called with the NextNodeGuid of the selected choice.
+    /// <paramref name="onChosen"/> is called with the index of the selected choice.
     /// </summary>
-    void ShowChoices(List<DialogueChoice> choices, Action<string> onChosen);
+    void ShowChoices(List<DialogueChoice> choices, Action<int> onChosen);
 
     /// <summary>Hide the choice UI (used for linear nodes).</summary>
     void HideChoices();

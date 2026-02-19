@@ -113,8 +113,9 @@ public class DialogueRunner : MonoBehaviour
         _currentNode = node;
 
         // Apply relationship changes via RelationshipSystem
-        if (RelationshipSystem.Instance != null && node.RelationshipChanges != null)
+        if (RelationshipSystem.Instance != null && node.RelationshipChanges != null && node.RelationshipChanges.Count > 0)
         {
+            Debug.Log($"[DialogueRunner] Applying {node.RelationshipChanges.Count} relationship change(s) from node '{node.DisplayName}'");
             foreach (var change in node.RelationshipChanges)
             {
                 if (change.From != null && change.To != null)
@@ -126,8 +127,8 @@ public class DialogueRunner : MonoBehaviour
 
         if (!node.IsLinear)
         {
-            // Branching: show choices and let the presenter call back with a GUID
-            _presenter.ShowChoices(node.Choices, GoToNode);
+            // Branching: show choices and let the presenter call back with choice index
+            _presenter.ShowChoices(node.Choices, choiceIndex => OnChoiceSelected(choiceIndex));
         }
         else
         {
@@ -153,6 +154,60 @@ public class DialogueRunner : MonoBehaviour
         }
 
         PresentNode(node);
+    }
+
+    private void OnChoiceSelected(int choiceIndex)
+    {
+        if (_currentNode == null || _currentNode.Choices == null || choiceIndex < 0 || choiceIndex >= _currentNode.Choices.Count)
+        {
+            Debug.LogError($"[{name}] Invalid choice index {choiceIndex}.", this);
+            return;
+        }
+
+        var choice = _currentNode.Choices[choiceIndex];
+
+        // Apply relationship effect if delta is non-zero
+        if (choice.RelationshipDelta != 0 && RelationshipSystem.Instance != null)
+        {
+            VNCharacter from, to;
+
+            if (choice.AutoApplyBetweenCurrentSpeakers)
+            {
+                from = _currentNode.Speaker;
+                to = GetOtherActiveCharacter(from);
+            }
+            else
+            {
+                from = choice.FromOverride;
+                to = choice.ToOverride;
+            }
+
+            if (from != null && to != null)
+            {
+                Debug.Log($"[DialogueRunner] Applying choice relationship effect: '{choice.Text}'");
+                RelationshipSystem.Instance.ModifyRelationship(from, to, choice.RelationshipDelta);
+            }
+            else
+            {
+                Debug.LogWarning($"[DialogueRunner] Choice '{choice.Text}' has relationship delta but missing From/To characters.");
+            }
+        }
+
+        // Navigate to next node
+        GoToNode(choice.NextNodeGuid);
+    }
+
+    private VNCharacter GetOtherActiveCharacter(VNCharacter current)
+    {
+        if (_presenter == null) return null;
+
+        var leftChar = (_presenter as VNDialoguePresenter)?.GetLeftCharacter();
+        var rightChar = (_presenter as VNDialoguePresenter)?.GetRightCharacter();
+
+        if (leftChar == current) return rightChar;
+        if (rightChar == current) return leftChar;
+
+        return null;
     }
 
     private void EndDialogue()

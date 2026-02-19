@@ -47,6 +47,13 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
     private VNCharacter _rightCharacter;
 
     // -------------------------------------------------------------------------
+    // Public accessors for DialogueRunner
+    // -------------------------------------------------------------------------
+
+    public VNCharacter GetLeftCharacter() => _leftCharacter;
+    public VNCharacter GetRightCharacter() => _rightCharacter;
+
+    // -------------------------------------------------------------------------
     // Unity lifecycle
     // -------------------------------------------------------------------------
 
@@ -92,7 +99,7 @@ public class VNDialoguePresenter : MonoBehaviour, IDialoguePresenter
         UpdateActorHighlight(node.Speaker);
     }
 
-    public void ShowChoices(List<DialogueChoice> choices, Action<string> onChosen)
+    public void ShowChoices(List<DialogueChoice> choices, Action<int> onChosen)
     {
         if (!_initialized) return;
 

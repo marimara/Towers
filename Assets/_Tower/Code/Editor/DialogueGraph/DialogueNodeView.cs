@@ -198,6 +198,10 @@ public class DialogueNodeView : Node
         {
             var choiceRef = choice; // capture for closures
 
+            var choiceContainer = new VisualElement();
+            choiceContainer.style.marginBottom = 4;
+
+            // Main row: delete button, text field, port
             var row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
             row.style.alignItems    = Align.Center;
@@ -225,7 +229,79 @@ public class DialogueNodeView : Node
             row.Add(textField);
             row.Add(port);
 
-            _choicesSection.Add(row);
+            choiceContainer.Add(row);
+
+            // Relationship effect toggle
+            var hasEffectToggle = new Toggle("Has Relationship Effect") { value = choice.HasRelationshipEffect };
+            hasEffectToggle.style.marginLeft = 24;
+            hasEffectToggle.RegisterValueChangedCallback(e =>
+            {
+                Undo.RecordObject(_ownerData, "Toggle Relationship Effect");
+                choiceRef.HasRelationshipEffect = e.newValue;
+                ScheduleSave();
+                RebuildChoicePorts(); // Rebuild to show/hide relationship fields
+            });
+            choiceContainer.Add(hasEffectToggle);
+
+            // Relationship effect fields (only shown when HasRelationshipEffect is true)
+            if (choice.HasRelationshipEffect)
+            {
+                var relationshipSection = new VisualElement();
+                relationshipSection.style.marginLeft = 24;
+                relationshipSection.style.marginTop = 2;
+                relationshipSection.style.paddingLeft = 4;
+                relationshipSection.style.paddingRight = 4;
+                relationshipSection.style.paddingTop = 2;
+                relationshipSection.style.paddingBottom = 2;
+                relationshipSection.style.backgroundColor = new Color(.05f, .05f, .05f);
+
+                // Relationship delta
+                var deltaField = new IntegerField("Δ Relationship") { value = choice.RelationshipDelta };
+                deltaField.RegisterValueChangedCallback(e =>
+                {
+                    Undo.RecordObject(_ownerData, "Change Relationship Delta");
+                    choiceRef.RelationshipDelta = e.newValue;
+                    ScheduleSave();
+                });
+                relationshipSection.Add(deltaField);
+
+                // Auto apply toggle
+                var autoToggle = new Toggle("Auto Apply Between Current Speakers") { value = choice.AutoApplyBetweenCurrentSpeakers };
+                autoToggle.RegisterValueChangedCallback(e =>
+                {
+                    Undo.RecordObject(_ownerData, "Toggle Auto Apply");
+                    choiceRef.AutoApplyBetweenCurrentSpeakers = e.newValue;
+                    ScheduleSave();
+                    RebuildChoicePorts(); // Rebuild to show/hide overrides
+                });
+                relationshipSection.Add(autoToggle);
+
+                // Override fields (only shown when auto apply is false)
+                if (!choice.AutoApplyBetweenCurrentSpeakers)
+                {
+                    var fromField = new ObjectField("From Override") { objectType = typeof(VNCharacter), value = choice.FromOverride };
+                    fromField.RegisterValueChangedCallback(e =>
+                    {
+                        Undo.RecordObject(_ownerData, "Change From Override");
+                        choiceRef.FromOverride = (VNCharacter)e.newValue;
+                        ScheduleSave();
+                    });
+                    relationshipSection.Add(fromField);
+
+                    var toField = new ObjectField("To Override") { objectType = typeof(VNCharacter), value = choice.ToOverride };
+                    toField.RegisterValueChangedCallback(e =>
+                    {
+                        Undo.RecordObject(_ownerData, "Change To Override");
+                        choiceRef.ToOverride = (VNCharacter)e.newValue;
+                        ScheduleSave();
+                    });
+                    relationshipSection.Add(toField);
+                }
+
+                choiceContainer.Add(relationshipSection);
+            }
+
+            _choicesSection.Add(choiceContainer);
             outputContainer.Add(port);
             ChoiceOutputPorts.Add(port);
         }

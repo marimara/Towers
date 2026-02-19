@@ -940,6 +940,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 712323436}
+  - component: {fileID: 712323437}
   m_Layer: 0
   m_Name: Relation Manager
   m_TagString: Untagged
@@ -962,6 +963,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &712323437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 712323435}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7be28607f5d23984696dac9be84c8ecc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RelationshipSystem
+  _raceMatrix: {fileID: 11400000, guid: 860d244b7a6733944a62b55caf6aeb7a, type: 2}
+  _tierConfig: {fileID: 11400000, guid: 97d9c32205988004a9d2fc0fa18b1bfe, type: 2}
+  _importantCharacters:
+  - {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+  - {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
 --- !u!1 &770564850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1381,7 +1399,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
   _dialogueData: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
   _presenter: {fileID: 1208981760}
-  _raceMatrix: {fileID: 0}
 --- !u!1 &1437812854
 GameObject:
   m_ObjectHideFlags: 0
@@ -1678,7 +1695,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
   _dialogueData: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
   _presenter: {fileID: 1208981760}
-  _raceMatrix: {fileID: 0}
 --- !u!1 &1765802130
 GameObject:
   m_ObjectHideFlags: 0

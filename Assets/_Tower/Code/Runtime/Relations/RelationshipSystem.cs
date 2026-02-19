@@ -89,7 +89,18 @@ public class RelationshipSystem : MonoBehaviour
             return;
         }
 
+        if (from == null || to == null)
+            return;
+
+        int oldValue = _manager.Get(from, to);
         _manager.Modify(from, to, delta);
+        int newValue = _manager.Get(from, to);
+
+        string tierName = _tierConfig != null ? _tierConfig.GetTierName(newValue) : "Unknown";
+        string fromName = from.DisplayName ?? from.name;
+        string toName = to.DisplayName ?? to.name;
+
+        Debug.Log($"[REL] {fromName} → {toName} : {delta:+#;-#;0} | {oldValue} → {newValue} | Tier: {tierName}");
     }
 
     /// <summary>

@@ -34,12 +34,13 @@ public sealed class ChoiceButtonPool
     /// <summary>
     /// Return all active buttons to the pool and present the new set of choices.
     /// </summary>
-    public void Present(List<DialogueChoice> choices, Action<string> onChosen)
+    public void Present(List<DialogueChoice> choices, Action<int> onChosen)
     {
         ReturnAll();
 
-        foreach (var choice in choices)
+        for (int i = 0; i < choices.Count; i++)
         {
+            var choice = choices[i];
             var btn = Rent();
 
             var label = btn.GetComponentInChildren<TMP_Text>();
@@ -47,8 +48,8 @@ public sealed class ChoiceButtonPool
                 label.text = choice.Text;
 
             btn.onClick.RemoveAllListeners();
-            string guid = choice.NextNodeGuid; // capture for closure
-            btn.onClick.AddListener(() => onChosen(guid));
+            int index = i; // capture for closure
+            btn.onClick.AddListener(() => onChosen(index));
 
             btn.gameObject.SetActive(true);
             _active.Add(btn);
