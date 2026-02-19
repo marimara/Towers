@@ -1,0 +1,378 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a45dfd8c442f0f04eba2f6e203c20806, type: 3}
+  m_Name: Global_RaceMatrix
+  m_EditorClassIdentifier: Assembly-CSharp::RaceRelationshipMatrix
+  Entries:
+  - From: 0
+    To: 0
+    InitialModifier: 15
+  - From: 0
+    To: 1
+    InitialModifier: 5
+  - From: 0
+    To: 2
+    InitialModifier: -5
+  - From: 0
+    To: 3
+    InitialModifier: -10
+  - From: 0
+    To: 4
+    InitialModifier: 5
+  - From: 0
+    To: 5
+    InitialModifier: -20
+  - From: 0
+    To: 6
+    InitialModifier: -10
+  - From: 0
+    To: 7
+    InitialModifier: -25
+  - From: 0
+    To: 8
+    InitialModifier: -15
+  - From: 0
+    To: 9
+    InitialModifier: -5
+  - From: 0
+    To: 10
+    InitialModifier: -10
+  - From: 1
+    To: 0
+    InitialModifier: 5
+  - From: 1
+    To: 1
+    InitialModifier: 15
+  - From: 1
+    To: 2
+    InitialModifier: -25
+  - From: 1
+    To: 3
+    InitialModifier: -5
+  - From: 1
+    To: 4
+    InitialModifier: 10
+  - From: 1
+    To: 5
+    InitialModifier: -30
+  - From: 1
+    To: 6
+    InitialModifier: 0
+  - From: 1
+    To: 7
+    InitialModifier: -35
+  - From: 1
+    To: 8
+    InitialModifier: -15
+  - From: 1
+    To: 9
+    InitialModifier: 0
+  - From: 1
+    To: 10
+    InitialModifier: -20
+  - From: 2
+    To: 0
+    InitialModifier: -5
+  - From: 2
+    To: 1
+    InitialModifier: -20
+  - From: 2
+    To: 2
+    InitialModifier: 15
+  - From: 2
+    To: 3
+    InitialModifier: -10
+  - From: 2
+    To: 4
+    InitialModifier: 0
+  - From: 2
+    To: 5
+    InitialModifier: -10
+  - From: 2
+    To: 6
+    InitialModifier: 0
+  - From: 2
+    To: 7
+    InitialModifier: 5
+  - From: 2
+    To: 8
+    InitialModifier: 0
+  - From: 2
+    To: 9
+    InitialModifier: 5
+  - From: 2
+    To: 10
+    InitialModifier: 10
+  - From: 3
+    To: 0
+    InitialModifier: 10
+  - From: 3
+    To: 1
+    InitialModifier: -5
+  - From: 3
+    To: 2
+    InitialModifier: -10
+  - From: 3
+    To: 3
+    InitialModifier: 15
+  - From: 3
+    To: 4
+    InitialModifier: 0
+  - From: 3
+    To: 5
+    InitialModifier: -25
+  - From: 3
+    To: 6
+    InitialModifier: 0
+  - From: 3
+    To: 7
+    InitialModifier: -30
+  - From: 3
+    To: 8
+    InitialModifier: -15
+  - From: 3
+    To: 9
+    InitialModifier: 5
+  - From: 3
+    To: 10
+    InitialModifier: -10
+  - From: 4
+    To: 0
+    InitialModifier: 5
+  - From: 4
+    To: 1
+    InitialModifier: 10
+  - From: 4
+    To: 2
+    InitialModifier: 0
+  - From: 4
+    To: 3
+    InitialModifier: 0
+  - From: 4
+    To: 4
+    InitialModifier: 15
+  - From: 4
+    To: 5
+    InitialModifier: -15
+  - From: 4
+    To: 6
+    InitialModifier: 0
+  - From: 4
+    To: 7
+    InitialModifier: -20
+  - From: 4
+    To: 8
+    InitialModifier: -10
+  - From: 4
+    To: 9
+    InitialModifier: 5
+  - From: 4
+    To: 10
+    InitialModifier: -5
+  - From: 5
+    To: 0
+    InitialModifier: -20
+  - From: 5
+    To: 1
+    InitialModifier: -30
+  - From: 5
+    To: 2
+    InitialModifier: -10
+  - From: 5
+    To: 3
+    InitialModifier: -25
+  - From: 5
+    To: 4
+    InitialModifier: -15
+  - From: 5
+    To: 5
+    InitialModifier: 15
+  - From: 5
+    To: 6
+    InitialModifier: 5
+  - From: 5
+    To: 7
+    InitialModifier: 10
+  - From: 5
+    To: 8
+    InitialModifier: 0
+  - From: 5
+    To: 9
+    InitialModifier: 0
+  - From: 5
+    To: 10
+    InitialModifier: 5
+  - From: 6
+    To: 0
+    InitialModifier: -10
+  - From: 6
+    To: 1
+    InitialModifier: -15
+  - From: 6
+    To: 2
+    InitialModifier: 0
+  - From: 6
+    To: 3
+    InitialModifier: 5
+  - From: 6
+    To: 4
+    InitialModifier: -5
+  - From: 6
+    To: 5
+    InitialModifier: 5
+  - From: 6
+    To: 6
+    InitialModifier: 15
+  - From: 6
+    To: 7
+    InitialModifier: 10
+  - From: 6
+    To: 8
+    InitialModifier: 10
+  - From: 6
+    To: 9
+    InitialModifier: 5
+  - From: 6
+    To: 10
+    InitialModifier: 5
+  - From: 7
+    To: 0
+    InitialModifier: -25
+  - From: 7
+    To: 1
+    InitialModifier: -35
+  - From: 7
+    To: 2
+    InitialModifier: 5
+  - From: 7
+    To: 3
+    InitialModifier: -30
+  - From: 7
+    To: 4
+    InitialModifier: -20
+  - From: 7
+    To: 5
+    InitialModifier: 10
+  - From: 7
+    To: 6
+    InitialModifier: 10
+  - From: 7
+    To: 7
+    InitialModifier: 15
+  - From: 7
+    To: 8
+    InitialModifier: 5
+  - From: 7
+    To: 9
+    InitialModifier: 0
+  - From: 7
+    To: 10
+    InitialModifier: 20
+  - From: 8
+    To: 0
+    InitialModifier: -15
+  - From: 8
+    To: 1
+    InitialModifier: -15
+  - From: 8
+    To: 2
+    InitialModifier: 0
+  - From: 8
+    To: 3
+    InitialModifier: -15
+  - From: 8
+    To: 4
+    InitialModifier: -10
+  - From: 8
+    To: 5
+    InitialModifier: 5
+  - From: 8
+    To: 6
+    InitialModifier: 10
+  - From: 8
+    To: 7
+    InitialModifier: 5
+  - From: 8
+    To: 8
+    InitialModifier: 15
+  - From: 8
+    To: 9
+    InitialModifier: 5
+  - From: 8
+    To: 10
+    InitialModifier: 0
+  - From: 9
+    To: 0
+    InitialModifier: -5
+  - From: 9
+    To: 1
+    InitialModifier: 0
+  - From: 9
+    To: 2
+    InitialModifier: 5
+  - From: 9
+    To: 3
+    InitialModifier: 5
+  - From: 9
+    To: 4
+    InitialModifier: 5
+  - From: 9
+    To: 5
+    InitialModifier: 0
+  - From: 9
+    To: 6
+    InitialModifier: 5
+  - From: 9
+    To: 7
+    InitialModifier: 0
+  - From: 9
+    To: 8
+    InitialModifier: 5
+  - From: 9
+    To: 9
+    InitialModifier: 15
+  - From: 9
+    To: 10
+    InitialModifier: 0
+  - From: 10
+    To: 0
+    InitialModifier: -10
+  - From: 10
+    To: 1
+    InitialModifier: -20
+  - From: 10
+    To: 2
+    InitialModifier: 10
+  - From: 10
+    To: 3
+    InitialModifier: -10
+  - From: 10
+    To: 4
+    InitialModifier: -5
+  - From: 10
+    To: 5
+    InitialModifier: 5
+  - From: 10
+    To: 6
+    InitialModifier: 5
+  - From: 10
+    To: 7
+    InitialModifier: 20
+  - From: 10
+    To: 8
+    InitialModifier: 0
+  - From: 10
+    To: 9
+    InitialModifier: 0
+  - From: 10
+    To: 10
+    InitialModifier: 15

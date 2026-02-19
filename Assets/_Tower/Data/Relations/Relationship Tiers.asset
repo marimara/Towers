@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 777e522df7179ab4fb1027e75db86ca0, type: 3}
+  m_Name: Relationship Tiers
+  m_EditorClassIdentifier: Assembly-CSharp::RelationshipTierConfig
+  Tiers:
+  - Name: Hostile
+    Min: 1
+    Max: 15
+  - Name: Distrustful
+    Min: 16
+    Max: 35
+  - Name: Neutral
+    Min: 36
+    Max: 55
+  - Name: Friendly
+    Min: 56
+    Max: 75
+  - Name: Loyal
+    Min: 76
+    Max: 90
+  - Name: Romantic
+    Min: 91
+    Max: 100
