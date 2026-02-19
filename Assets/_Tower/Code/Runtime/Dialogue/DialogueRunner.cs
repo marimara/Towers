@@ -118,8 +118,7 @@ public class DialogueRunner : MonoBehaviour
             Debug.Log($"[DialogueRunner] Applying {node.RelationshipChanges.Count} relationship change(s) from node '{node.DisplayName}'");
             foreach (var change in node.RelationshipChanges)
             {
-                if (change.From != null && change.To != null)
-                    RelationshipSystem.Instance.ModifyRelationship(change.From, change.To, change.Delta);
+                ApplyRelationshipChange(change, node);
             }
         }
 
@@ -166,35 +165,55 @@ public class DialogueRunner : MonoBehaviour
 
         var choice = _currentNode.Choices[choiceIndex];
 
-        // Apply relationship effect if delta is non-zero
-        if (choice.RelationshipDelta != 0 && RelationshipSystem.Instance != null)
+        // Apply relationship changes from choice
+        if (RelationshipSystem.Instance != null && choice.RelationshipChanges != null && choice.RelationshipChanges.Count > 0)
         {
-            VNCharacter from, to;
-
-            if (choice.AutoApplyBetweenCurrentSpeakers)
+            Debug.Log($"[DialogueRunner] Applying {choice.RelationshipChanges.Count} relationship change(s) from choice '{choice.Text}'");
+            foreach (var change in choice.RelationshipChanges)
             {
-                from = _currentNode.Speaker;
-                to = GetOtherActiveCharacter(from);
-            }
-            else
-            {
-                from = choice.FromOverride;
-                to = choice.ToOverride;
-            }
-
-            if (from != null && to != null)
-            {
-                Debug.Log($"[DialogueRunner] Applying choice relationship effect: '{choice.Text}'");
-                RelationshipSystem.Instance.ModifyRelationship(from, to, choice.RelationshipDelta);
-            }
-            else
-            {
-                Debug.LogWarning($"[DialogueRunner] Choice '{choice.Text}' has relationship delta but missing From/To characters.");
+                ApplyRelationshipChange(change, _currentNode);
             }
         }
 
         // Navigate to next node
         GoToNode(choice.NextNodeGuid);
+    }
+
+    private void ApplyRelationshipChange(RelationshipChange change, DialogueNode contextNode)
+    {
+        if (RelationshipSystem.Instance == null) return;
+
+        VNCharacter from, to;
+
+        if (change.AutoBetweenCurrentSpeakers)
+        {
+            from = contextNode.Speaker;
+            to = GetOtherActiveCharacter(from);
+            
+            if (from == null || to == null)
+            {
+                Debug.LogWarning($"[DialogueRunner] AutoBetweenCurrentSpeakers enabled but could not resolve characters. Speaker: {from?.name ?? "null"}, Other: {to?.name ?? "null"}");
+                return;
+            }
+        }
+        else
+        {
+            from = change.From;
+            to = change.To;
+            
+            if (from == null || to == null)
+            {
+                Debug.LogWarning($"[DialogueRunner] RelationshipChange has null From or To character.");
+                return;
+            }
+        }
+
+        RelationshipSystem.Instance.ModifyRelationship(from, to, change.Delta);
+
+        if (change.Mutual)
+        {
+            RelationshipSystem.Instance.ModifyRelationship(to, from, change.Delta);
+        }
     }
 
     private VNCharacter GetOtherActiveCharacter(VNCharacter current)

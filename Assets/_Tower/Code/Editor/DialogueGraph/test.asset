@@ -23,18 +23,20 @@ MonoBehaviour:
     Choices:
     - Text: What
       NextNodeGuid: d17b700d-eaf7-4d16-ab03-13a346c290a5
-      HasRelationshipEffect: 1
-      RelationshipDelta: -10
-      AutoApplyBetweenCurrentSpeakers: 0
-      FromOverride: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
-      ToOverride: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+      RelationshipChanges:
+      - AutoBetweenCurrentSpeakers: 0
+        From: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+        To: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+        Delta: -5
+        Mutual: 0
+      - AutoBetweenCurrentSpeakers: 0
+        From: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+        To: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+        Delta: -5
+        Mutual: 0
     - Text: Me?
       NextNodeGuid: 514b119c-0e83-46cd-bcca-40d976fbcdef
-      HasRelationshipEffect: 0
-      RelationshipDelta: 0
-      AutoApplyBetweenCurrentSpeakers: 0
-      FromOverride: {fileID: 0}
-      ToOverride: {fileID: 0}
+      RelationshipChanges: []
     NextNodeGuid: 
     RelationshipChanges: []
   - Guid: d17b700d-eaf7-4d16-ab03-13a346c290a5

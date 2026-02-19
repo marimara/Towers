@@ -17,30 +17,9 @@ public class DialogueChoice
     // Relationship effects
     // -------------------------------------------------------------------------
 
-    [Tooltip("Enable relationship modification when this choice is selected.")]
-    public bool HasRelationshipEffect;
-
-    [FoldoutGroup("Relationship Effect")]
-    [ShowIf(nameof(HasRelationshipEffect))]
-    [Tooltip("Relationship value change applied when this choice is selected.")]
-    public int RelationshipDelta;
-
-    [FoldoutGroup("Relationship Effect")]
-    [ShowIf(nameof(HasRelationshipEffect))]
-    [Tooltip("If true, applies relationship delta between current node speaker and the other active character.")]
-    public bool AutoApplyBetweenCurrentSpeakers;
-
-    [FoldoutGroup("Relationship Effect")]
-    [ShowIf(nameof(ShowOverrides))]
-    [Tooltip("Optional override for the 'From' character. Used when AutoApplyBetweenCurrentSpeakers is false.")]
-    public VNCharacter FromOverride;
-
-    [FoldoutGroup("Relationship Effect")]
-    [ShowIf(nameof(ShowOverrides))]
-    [Tooltip("Optional override for the 'To' character. Used when AutoApplyBetweenCurrentSpeakers is false.")]
-    public VNCharacter ToOverride;
-
-    private bool ShowOverrides() => HasRelationshipEffect && !AutoApplyBetweenCurrentSpeakers;
+    [Tooltip("Relationship changes applied when this choice is selected.")]
+    [ListDrawerSettings(ShowFoldout = true)]
+    public System.Collections.Generic.List<RelationshipChange> RelationshipChanges = new();
 
     // Phase 5 hook — uncomment when conditions are implemented
     // public string ConditionId;

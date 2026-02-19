@@ -231,74 +231,186 @@ public class DialogueNodeView : Node
 
             choiceContainer.Add(row);
 
-            // Relationship effect toggle
-            var hasEffectToggle = new Toggle("Has Relationship Effect") { value = choice.HasRelationshipEffect };
-            hasEffectToggle.style.marginLeft = 24;
-            hasEffectToggle.RegisterValueChangedCallback(e =>
+            // Relationship toggle
+            var hasRelToggle = new Toggle("Affects Relationship") 
+            { 
+                value = choice.RelationshipChanges != null
+            };
+            hasRelToggle.style.marginLeft = 24;
+            hasRelToggle.style.marginTop = 2;
+            hasRelToggle.RegisterValueChangedCallback(e =>
             {
-                Undo.RecordObject(_ownerData, "Toggle Relationship Effect");
-                choiceRef.HasRelationshipEffect = e.newValue;
-                ScheduleSave();
-                RebuildChoicePorts(); // Rebuild to show/hide relationship fields
+                Undo.RecordObject(_ownerData, "Toggle Relationship Effects");
+                if (e.newValue)
+                {
+                    if (choiceRef.RelationshipChanges == null)
+                        choiceRef.RelationshipChanges = new System.Collections.Generic.List<RelationshipChange>();
+                }
+                else
+                {
+                    choiceRef.RelationshipChanges = null;
+                }
+                EditorUtility.SetDirty(_ownerData);
+                RebuildChoicePorts(); // Rebuild to show/hide relationship UI
             });
-            choiceContainer.Add(hasEffectToggle);
+            choiceContainer.Add(hasRelToggle);
 
-            // Relationship effect fields (only shown when HasRelationshipEffect is true)
-            if (choice.HasRelationshipEffect)
+            // Relationship changes list (only shown when list is not null)
+            if (choice.RelationshipChanges != null)
             {
-                var relationshipSection = new VisualElement();
-                relationshipSection.style.marginLeft = 24;
-                relationshipSection.style.marginTop = 2;
-                relationshipSection.style.paddingLeft = 4;
-                relationshipSection.style.paddingRight = 4;
-                relationshipSection.style.paddingTop = 2;
-                relationshipSection.style.paddingBottom = 2;
-                relationshipSection.style.backgroundColor = new Color(.05f, .05f, .05f);
+                var relSection = new VisualElement();
+                relSection.style.marginLeft = 24;
+                relSection.style.marginTop = 2;
+                relSection.style.paddingLeft = 4;
+                relSection.style.paddingRight = 4;
+                relSection.style.paddingTop = 2;
+                relSection.style.paddingBottom = 2;
+                relSection.style.backgroundColor = new Color(.05f, .05f, .05f);
 
-                // Relationship delta
-                var deltaField = new IntegerField("Δ Relationship") { value = choice.RelationshipDelta };
-                deltaField.RegisterValueChangedCallback(e =>
-                {
-                    Undo.RecordObject(_ownerData, "Change Relationship Delta");
-                    choiceRef.RelationshipDelta = e.newValue;
-                    ScheduleSave();
-                });
-                relationshipSection.Add(deltaField);
+                var relLabel = new Label($"Relationship Changes ({choice.RelationshipChanges.Count})");
+                relLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                relLabel.style.marginBottom = 4;
+                relSection.Add(relLabel);
 
-                // Auto apply toggle
-                var autoToggle = new Toggle("Auto Apply Between Current Speakers") { value = choice.AutoApplyBetweenCurrentSpeakers };
-                autoToggle.RegisterValueChangedCallback(e =>
+                // Display each relationship change entry
+                for (int i = 0; i < choice.RelationshipChanges.Count; i++)
                 {
-                    Undo.RecordObject(_ownerData, "Toggle Auto Apply");
-                    choiceRef.AutoApplyBetweenCurrentSpeakers = e.newValue;
-                    ScheduleSave();
-                    RebuildChoicePorts(); // Rebuild to show/hide overrides
-                });
-                relationshipSection.Add(autoToggle);
+                    var changeRef = choice.RelationshipChanges[i];
+                    int changeIndex = i; // capture for closures
 
-                // Override fields (only shown when auto apply is false)
-                if (!choice.AutoApplyBetweenCurrentSpeakers)
-                {
-                    var fromField = new ObjectField("From Override") { objectType = typeof(VNCharacter), value = choice.FromOverride };
-                    fromField.RegisterValueChangedCallback(e =>
+                    var changeContainer = new VisualElement();
+                    changeContainer.style.marginBottom = 4;
+                    changeContainer.style.paddingLeft = 2;
+                    changeContainer.style.paddingRight = 2;
+                    changeContainer.style.paddingTop = 2;
+                    changeContainer.style.paddingBottom = 2;
+                    changeContainer.style.backgroundColor = new Color(.03f, .03f, .03f);
+
+                    // Auto toggle
+                    var autoToggle = new Toggle("Auto Between Current Speakers") { value = changeRef.AutoBetweenCurrentSpeakers };
+                    autoToggle.RegisterValueChangedCallback(e =>
                     {
-                        Undo.RecordObject(_ownerData, "Change From Override");
-                        choiceRef.FromOverride = (VNCharacter)e.newValue;
+                        Undo.RecordObject(_ownerData, "Toggle Auto Between Speakers");
+                        changeRef.AutoBetweenCurrentSpeakers = e.newValue;
+                        ScheduleSave();
+                        RebuildChoicePorts(); // Rebuild to show/hide From/To fields
+                    });
+                    changeContainer.Add(autoToggle);
+
+                    // From field (hidden when auto is enabled)
+                    if (!changeRef.AutoBetweenCurrentSpeakers)
+                    {
+                        var fromField = new ObjectField("From") { objectType = typeof(VNCharacter), value = changeRef.From };
+                        fromField.RegisterValueChangedCallback(e =>
+                        {
+                            Undo.RecordObject(_ownerData, "Change From Character");
+                            changeRef.From = (VNCharacter)e.newValue;
+                            ScheduleSave();
+                        });
+                        changeContainer.Add(fromField);
+
+                        var toField = new ObjectField("To") { objectType = typeof(VNCharacter), value = changeRef.To };
+                        toField.RegisterValueChangedCallback(e =>
+                        {
+                            Undo.RecordObject(_ownerData, "Change To Character");
+                            changeRef.To = (VNCharacter)e.newValue;
+                            ScheduleSave();
+                        });
+                        changeContainer.Add(toField);
+                    }
+
+                    // Delta field
+                    var deltaField = new IntegerField("Delta") { value = changeRef.Delta };
+                    deltaField.RegisterValueChangedCallback(e =>
+                    {
+                        Undo.RecordObject(_ownerData, "Change Relationship Delta");
+                        changeRef.Delta = e.newValue;
                         ScheduleSave();
                     });
-                    relationshipSection.Add(fromField);
+                    changeContainer.Add(deltaField);
 
-                    var toField = new ObjectField("To Override") { objectType = typeof(VNCharacter), value = choice.ToOverride };
-                    toField.RegisterValueChangedCallback(e =>
+                    // Mutual toggle
+                    var mutualToggle = new Toggle("Mutual") { value = changeRef.Mutual };
+                    mutualToggle.RegisterValueChangedCallback(e =>
                     {
-                        Undo.RecordObject(_ownerData, "Change To Override");
-                        choiceRef.ToOverride = (VNCharacter)e.newValue;
+                        Undo.RecordObject(_ownerData, "Toggle Mutual");
+                        changeRef.Mutual = e.newValue;
                         ScheduleSave();
                     });
-                    relationshipSection.Add(toField);
+                    changeContainer.Add(mutualToggle);
+
+                    // Action buttons row
+                    var btnRow = new VisualElement();
+                    btnRow.style.flexDirection = FlexDirection.Row;
+                    btnRow.style.marginTop = 2;
+
+                    var makeMutualBtn = new Button(() =>
+                    {
+                        if (changeRef.From == null || changeRef.To == null)
+                        {
+                            Debug.LogWarning("[DialogueNodeView] Cannot make mutual - From or To is null.");
+                            return;
+                        }
+
+                        Undo.RecordObject(_ownerData, "Make Relationship Mutual");
+
+                        // Check if reverse already exists
+                        bool reverseExists = false;
+                        foreach (var existing in choiceRef.RelationshipChanges)
+                        {
+                            if (existing.From == changeRef.To && existing.To == changeRef.From)
+                            {
+                                existing.Delta = changeRef.Delta;
+                                reverseExists = true;
+                                break;
+                            }
+                        }
+
+                        if (!reverseExists)
+                        {
+                            choiceRef.RelationshipChanges.Add(new RelationshipChange
+                            {
+                                From = changeRef.To,
+                                To = changeRef.From,
+                                Delta = changeRef.Delta,
+                                AutoBetweenCurrentSpeakers = false,
+                                Mutual = false
+                            });
+                        }
+
+                        EditorUtility.SetDirty(_ownerData);
+                        RebuildChoicePorts();
+                    }) { text = "Make Mutual" };
+                    makeMutualBtn.style.flexGrow = 1;
+
+                    var removeBtn = new Button(() =>
+                    {
+                        Undo.RecordObject(_ownerData, "Remove Relationship Change");
+                        choiceRef.RelationshipChanges.RemoveAt(changeIndex);
+                        EditorUtility.SetDirty(_ownerData);
+                        RebuildChoicePorts();
+                    }) { text = "Remove" };
+                    removeBtn.style.flexGrow = 1;
+
+                    btnRow.Add(makeMutualBtn);
+                    btnRow.Add(removeBtn);
+                    changeContainer.Add(btnRow);
+
+                    relSection.Add(changeContainer);
                 }
 
-                choiceContainer.Add(relationshipSection);
+                // Add new change button
+                var addRelBtn = new Button(() =>
+                {
+                    Undo.RecordObject(_ownerData, "Add Relationship Change");
+                    choiceRef.RelationshipChanges.Add(new RelationshipChange());
+                    EditorUtility.SetDirty(_ownerData);
+                    RebuildChoicePorts();
+                }) { text = "+ Add Change" };
+                addRelBtn.style.marginTop = 2;
+                relSection.Add(addRelBtn);
+
+                choiceContainer.Add(relSection);
             }
 
             _choicesSection.Add(choiceContainer);
