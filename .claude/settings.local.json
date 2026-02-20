@@ -15,7 +15,13 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
-      "mcp__coplay-mcp__get_unity_editor_state"
+      "mcp__coplay-mcp__get_unity_editor_state",
+      "Bash(Remove-Item \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs.meta\" -ErrorAction SilentlyContinue -Force)",
+      "Bash(del /F \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs\")",
+      "Bash(del /F \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs.meta\")",
+      "mcp__coplay-mcp__execute_script",
+      "mcp__coplay-mcp__check_compile_errors"
     ]
   }
 }

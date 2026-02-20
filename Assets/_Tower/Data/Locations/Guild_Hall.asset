@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5209e2db4826e74c926ae37eff91b3c, type: 3}
+  m_Name: Guild_Hall
+  m_EditorClassIdentifier: Assembly-CSharp::LocationData
+  _id: 4e63b4b0b3e540b4997734aca1e8d3ac
+  DisplayName: Guild Hall
+  Background: {fileID: 21300000, guid: 60759f683d5b8084ea0fcd3de875b205, type: 3}
+  Music: {fileID: 0}
+  NPCsPresent:
+  - {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+  - {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+  AvailableActions: []
+  PossibleEvents: []
+  Tags: 01000000
