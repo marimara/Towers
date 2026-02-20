@@ -67,13 +67,26 @@ public class RelationshipManager
     /// <summary>
     /// Modify the relationship value between two characters by a delta.
     /// Automatically clamps the result between MIN_VALUE and MAX_VALUE.
+    /// Creates relationship entry if it doesn't exist (base 50 + race modifier).
     /// </summary>
     public void Modify(VNCharacter from, VNCharacter to, int delta)
     {
         if (from == null || to == null || from == to)
             return;
 
-        int current = Get(from, to);
+        // Ensure relationship exists before modifying
+        if (!_relationships.ContainsKey((from, to)))
+        {
+            int baseValue = BASE_VALUE;
+            if (_matrix != null)
+            {
+                int raceModifier = GetRaceModifier(from.Race, to.Race);
+                baseValue += raceModifier;
+            }
+            _relationships[(from, to)] = Mathf.Clamp(baseValue, MIN_VALUE, MAX_VALUE);
+        }
+
+        int current = _relationships[(from, to)];
         int newValue = Mathf.Clamp(current + delta, MIN_VALUE, MAX_VALUE);
         _relationships[(from, to)] = newValue;
     }

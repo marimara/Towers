@@ -231,7 +231,216 @@ public class DialogueNodeView : Node
 
             choiceContainer.Add(row);
 
-            // Relationship toggle
+            // Relationship tier requirement toggle
+            var requiresTierToggle = new Toggle("Requires Relationship Tier") 
+            { 
+                value = choice.RequiresRelationshipTier
+            };
+            requiresTierToggle.style.marginLeft = 24;
+            requiresTierToggle.style.marginTop = 2;
+            requiresTierToggle.RegisterValueChangedCallback(e =>
+            {
+                Undo.RecordObject(_ownerData, "Toggle Relationship Tier Requirement");
+                choiceRef.RequiresRelationshipTier = e.newValue;
+                if (e.newValue && choiceRef.AllowedTiers == null)
+                    choiceRef.AllowedTiers = new System.Collections.Generic.List<string>();
+                EditorUtility.SetDirty(_ownerData);
+                RebuildChoicePorts();
+            });
+            choiceContainer.Add(requiresTierToggle);
+
+            // Allowed tiers list (only shown when requirement is enabled)
+            if (choice.RequiresRelationshipTier)
+            {
+                var tierSection = new VisualElement();
+                tierSection.style.marginLeft = 48;
+                tierSection.style.marginTop = 2;
+                tierSection.style.paddingLeft = 4;
+                tierSection.style.paddingRight = 4;
+                tierSection.style.paddingTop = 2;
+                tierSection.style.paddingBottom = 2;
+                tierSection.style.backgroundColor = new Color(.06f, .06f, .06f);
+
+                var tierLabel = new Label("Allowed Tiers:");
+                tierLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                tierLabel.style.marginBottom = 2;
+                tierSection.Add(tierLabel);
+
+                if (choiceRef.AllowedTiers == null)
+                    choiceRef.AllowedTiers = new System.Collections.Generic.List<string>();
+
+                for (int t = 0; t < choiceRef.AllowedTiers.Count; t++)
+                {
+                    int tierIndex = t; // capture for closure
+                    var tierRow = new VisualElement();
+                    tierRow.style.flexDirection = FlexDirection.Row;
+                    tierRow.style.marginBottom = 2;
+
+                    var tierField = new TextField { value = choiceRef.AllowedTiers[tierIndex] };
+                    tierField.style.flexGrow = 1;
+                    tierField.RegisterValueChangedCallback(e =>
+                    {
+                        Undo.RecordObject(_ownerData, "Edit Allowed Tier");
+                        choiceRef.AllowedTiers[tierIndex] = e.newValue;
+                        ScheduleSave();
+                    });
+
+                    var removeTierBtn = new Button(() =>
+                    {
+                        Undo.RecordObject(_ownerData, "Remove Allowed Tier");
+                        choiceRef.AllowedTiers.RemoveAt(tierIndex);
+                        EditorUtility.SetDirty(_ownerData);
+                        RebuildChoicePorts();
+                    }) { text = "✕" };
+                    removeTierBtn.style.width = 20;
+
+                    tierRow.Add(tierField);
+                    tierRow.Add(removeTierBtn);
+                    tierSection.Add(tierRow);
+                }
+
+                var addTierBtn = new Button(() =>
+                {
+                    Undo.RecordObject(_ownerData, "Add Allowed Tier");
+                    choiceRef.AllowedTiers.Add("");
+                    EditorUtility.SetDirty(_ownerData);
+                    RebuildChoicePorts();
+                }) { text = "+ Add Tier" };
+                tierSection.Add(addTierBtn);
+
+                choiceContainer.Add(tierSection);
+            }
+
+            // Tier condition toggle
+            var requiresTierCondToggle = new Toggle("Requires Tier Condition") 
+            { 
+                value = choice.RequiresTierCondition
+            };
+            requiresTierCondToggle.style.marginLeft = 24;
+            requiresTierCondToggle.style.marginTop = 2;
+            requiresTierCondToggle.RegisterValueChangedCallback(e =>
+            {
+                Undo.RecordObject(_ownerData, "Toggle Tier Condition");
+                choiceRef.RequiresTierCondition = e.newValue;
+                EditorUtility.SetDirty(_ownerData);
+                RebuildChoicePorts();
+            });
+            choiceContainer.Add(requiresTierCondToggle);
+
+            // Tier condition fields (only shown when enabled)
+            if (choice.RequiresTierCondition)
+            {
+                var tierCondSection = new VisualElement();
+                tierCondSection.style.marginLeft = 48;
+                tierCondSection.style.marginTop = 2;
+                tierCondSection.style.paddingLeft = 4;
+                tierCondSection.style.paddingRight = 4;
+                tierCondSection.style.paddingTop = 2;
+                tierCondSection.style.paddingBottom = 2;
+                tierCondSection.style.backgroundColor = new Color(.06f, .06f, .06f);
+
+                // Logic operator dropdown
+                var logicField = new EnumField("Logic Operator", choice.LogicOperator);
+                logicField.RegisterValueChangedCallback(e =>
+                {
+                    Undo.RecordObject(_ownerData, "Change Logic Operator");
+                    choiceRef.LogicOperator = (TierLogicOperator)e.newValue;
+                    ScheduleSave();
+                });
+                tierCondSection.Add(logicField);
+
+                // Tier conditions label
+                var condLabel = new Label($"Tier Conditions ({choice.TierConditions?.Count ?? 0})");
+                condLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                condLabel.style.marginTop = 4;
+                condLabel.style.marginBottom = 2;
+                tierCondSection.Add(condLabel);
+
+                // Display each tier condition
+                if (choiceRef.TierConditions == null)
+                    choiceRef.TierConditions = new System.Collections.Generic.List<TierCondition>();
+
+                for (int tc = 0; tc < choiceRef.TierConditions.Count; tc++)
+                {
+                    int condIndex = tc; // capture for closure
+                    var condition = choiceRef.TierConditions[condIndex];
+
+                    var condContainer = new VisualElement();
+                    condContainer.style.marginBottom = 2;
+                    condContainer.style.paddingLeft = 2;
+                    condContainer.style.paddingRight = 2;
+                    condContainer.style.paddingTop = 2;
+                    condContainer.style.paddingBottom = 2;
+                    condContainer.style.backgroundColor = new Color(.03f, .03f, .03f);
+
+                    // Comparison mode
+                    var compField = new EnumField("Comparison", condition.ComparisonMode);
+                    compField.RegisterValueChangedCallback(e =>
+                    {
+                        Undo.RecordObject(_ownerData, "Change Comparison Mode");
+                        condition.ComparisonMode = (TierComparisonMode)e.newValue;
+                        ScheduleSave();
+                    });
+                    condContainer.Add(compField);
+
+                    // Required tier name dropdown
+                    var tierNames = GetTierNames();
+                    if (tierNames.Count > 0)
+                    {
+                        string currentValue = tierNames.Contains(condition.RequiredTierName) 
+                            ? condition.RequiredTierName 
+                            : tierNames[0];
+                        
+                        var tierDropdown = new PopupField<string>("Required Tier", tierNames, currentValue);
+                        tierDropdown.RegisterValueChangedCallback(e =>
+                        {
+                            Undo.RecordObject(_ownerData, "Change Required Tier");
+                            condition.RequiredTierName = e.newValue;
+                            ScheduleSave();
+                        });
+                        condContainer.Add(tierDropdown);
+                    }
+                    else
+                    {
+                        var helpLabel = new Label("No RelationshipTierConfig asset found");
+                        helpLabel.style.color = new Color(1f, 0.7f, 0.3f);
+                        helpLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
+                        condContainer.Add(helpLabel);
+                    }
+
+                    // Remove button
+                    var removeCondBtn = new Button(() =>
+                    {
+                        Undo.RecordObject(_ownerData, "Remove Tier Condition");
+                        choiceRef.TierConditions.RemoveAt(condIndex);
+                        EditorUtility.SetDirty(_ownerData);
+                        RebuildChoicePorts();
+                    }) { text = "Remove Condition" };
+                    condContainer.Add(removeCondBtn);
+
+                    tierCondSection.Add(condContainer);
+                }
+
+                // Add condition button
+                var addCondBtn = new Button(() =>
+                {
+                    Undo.RecordObject(_ownerData, "Add Tier Condition");
+                    var tierNames = GetTierNames();
+                    var newCondition = new TierCondition
+                    {
+                        RequiredTierName = tierNames.Count > 0 ? tierNames[0] : "",
+                        ComparisonMode = TierComparisonMode.GreaterOrEqual
+                    };
+                    choiceRef.TierConditions.Add(newCondition);
+                    EditorUtility.SetDirty(_ownerData);
+                    RebuildChoicePorts();
+                }) { text = "+ Add Condition" };
+                tierCondSection.Add(addCondBtn);
+
+                choiceContainer.Add(tierCondSection);
+            }
+
+            // Relationship effects toggle
             var hasRelToggle = new Toggle("Affects Relationship") 
             { 
                 value = choice.RelationshipChanges != null
@@ -514,5 +723,29 @@ public class DialogueNodeView : Node
     {
         if (string.IsNullOrEmpty(text)) return "Dialogue";
         return text.Length > 30 ? text[..30] + "..." : text;
+    }
+
+    private List<string> GetTierNames()
+    {
+        var tierNames = new List<string>();
+
+        // Find first RelationshipTierConfig asset in project
+        var guids = AssetDatabase.FindAssets("t:RelationshipTierConfig");
+        if (guids.Length == 0)
+            return tierNames;
+
+        var path = AssetDatabase.GUIDToAssetPath(guids[0]);
+        var tierConfig = AssetDatabase.LoadAssetAtPath<RelationshipTierConfig>(path);
+
+        if (tierConfig == null || tierConfig.Tiers == null)
+            return tierNames;
+
+        foreach (var tier in tierConfig.Tiers)
+        {
+            if (!string.IsNullOrEmpty(tier.Name))
+                tierNames.Add(tier.Name);
+        }
+
+        return tierNames;
     }
 }

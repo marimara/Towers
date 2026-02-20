@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -80,6 +81,20 @@ public class DialogueRunner : MonoBehaviour
         _dialogueData.BuildLookup();
         gameObject.SetActive(true);
 
+        // Register dialogue participants with RelationshipSystem
+        if (RelationshipSystem.Instance != null)
+        {
+            var participants = new System.Collections.Generic.List<VNCharacter>();
+            if (data.LeftCharacter != null) participants.Add(data.LeftCharacter);
+            if (data.RightCharacter != null) participants.Add(data.RightCharacter);
+
+            if (participants.Count > 0)
+            {
+                RelationshipSystem.Instance.Reinitialize(participants);
+                Debug.Log($"[DialogueRunner] Registered {participants.Count} dialogue participant(s) with RelationshipSystem.");
+            }
+        }
+
         DialogueNode startNode;
 
         if (!string.IsNullOrEmpty(startNodeGuid))
@@ -112,6 +127,26 @@ public class DialogueRunner : MonoBehaviour
     {
         _currentNode = node;
 
+        // Override dialogue participants if specified
+        if (node.OverrideParticipants)
+        {
+            _dialogueData.LeftCharacter = node.LeftParticipant;
+            _dialogueData.RightCharacter = node.RightParticipant;
+
+            if (RelationshipSystem.Instance != null)
+            {
+                var participants = new System.Collections.Generic.List<VNCharacter>();
+                if (node.LeftParticipant != null) participants.Add(node.LeftParticipant);
+                if (node.RightParticipant != null) participants.Add(node.RightParticipant);
+
+                if (participants.Count > 0)
+                {
+                    RelationshipSystem.Instance.Reinitialize(participants);
+                    Debug.Log($"[DialogueRunner] Node '{node.DisplayName}' overrode participants. Reinitialized RelationshipSystem.");
+                }
+            }
+        }
+
         // Apply relationship changes via RelationshipSystem
         if (RelationshipSystem.Instance != null && node.RelationshipChanges != null && node.RelationshipChanges.Count > 0)
         {
@@ -126,8 +161,9 @@ public class DialogueRunner : MonoBehaviour
 
         if (!node.IsLinear)
         {
-            // Branching: show choices and let the presenter call back with choice index
-            _presenter.ShowChoices(node.Choices, choiceIndex => OnChoiceSelected(choiceIndex));
+            // Branching: filter choices by relationship tier requirements
+            var allowedChoices = FilterChoicesByRelationshipTier(node);
+            _presenter.ShowChoices(allowedChoices, choiceIndex => OnChoiceSelected(choiceIndex));
         }
         else
         {
@@ -187,12 +223,12 @@ public class DialogueRunner : MonoBehaviour
 
         if (change.AutoBetweenCurrentSpeakers)
         {
-            from = contextNode.Speaker;
-            to = GetOtherActiveCharacter(from);
+            from = _dialogueData.LeftCharacter;
+            to = _dialogueData.RightCharacter;
             
             if (from == null || to == null)
             {
-                Debug.LogWarning($"[DialogueRunner] AutoBetweenCurrentSpeakers enabled but could not resolve characters. Speaker: {from?.name ?? "null"}, Other: {to?.name ?? "null"}");
+                Debug.LogWarning($"[DialogueRunner] AutoBetweenCurrentSpeakers enabled but DialogueData participants are missing. LeftCharacter: {from?.name ?? "null"}, RightCharacter: {to?.name ?? "null"}");
                 return;
             }
         }
@@ -214,6 +250,156 @@ public class DialogueRunner : MonoBehaviour
         {
             RelationshipSystem.Instance.ModifyRelationship(to, from, change.Delta);
         }
+    }
+
+    private System.Collections.Generic.List<DialogueChoice> FilterChoicesByRelationshipTier(DialogueNode node)
+    {
+        var filtered = new System.Collections.Generic.List<DialogueChoice>();
+
+        if (node.Choices == null || node.Choices.Count == 0)
+            return filtered;
+
+        VNCharacter speaker = node.Speaker;
+        VNCharacter other = GetOtherActiveCharacter(speaker);
+
+        foreach (var choice in node.Choices)
+        {
+            bool allowed = true;
+
+            // Check legacy tier requirement system
+            if (choice.RequiresRelationshipTier)
+            {
+                allowed = CheckLegacyTierRequirement(choice, speaker, other);
+                if (!allowed)
+                {
+                    Debug.Log($"[DialogueRunner] Choice '{choice.Text}' filtered out by legacy tier requirement.");
+                    continue;
+                }
+            }
+
+            // Check new tier condition system
+            if (choice.RequiresTierCondition)
+            {
+                allowed = CheckTierCondition(choice, speaker, other);
+                if (!allowed)
+                {
+                    Debug.Log($"[DialogueRunner] Choice '{choice.Text}' filtered out by tier condition.");
+                    continue;
+                }
+            }
+
+            if (allowed)
+                filtered.Add(choice);
+        }
+
+        return filtered;
+    }
+
+    private bool CheckLegacyTierRequirement(DialogueChoice choice, VNCharacter speaker, VNCharacter other)
+    {
+        // Fail-safe: if RelationshipSystem missing → disallow
+        if (RelationshipSystem.Instance == null)
+        {
+            Debug.LogError($"[DialogueRunner] Choice '{choice.Text}' requires relationship tier but RelationshipSystem is missing. Disallowing choice.");
+            return false;
+        }
+
+        // Always use dialogue participants
+        VNCharacter from = _dialogueData.LeftCharacter;
+        VNCharacter to = _dialogueData.RightCharacter;
+
+        if (from == null || to == null)
+        {
+            Debug.LogError($"[DialogueRunner] Choice '{choice.Text}' requires relationship tier but DialogueData participants are missing. LeftCharacter: {from?.name ?? "null"}, RightCharacter: {to?.name ?? "null"}. Disallowing choice.");
+            return false;
+        }
+
+        // Get current tier
+        string currentTier = RelationshipSystem.Instance.GetRelationshipTier(from, to);
+
+        // Check if current tier is in allowed list
+        return choice.AllowedTiers != null && choice.AllowedTiers.Contains(currentTier);
+    }
+
+    private bool CheckTierCondition(DialogueChoice choice, VNCharacter speaker, VNCharacter other)
+    {
+        // Fail-safe: if RelationshipSystem missing → disallow
+        if (RelationshipSystem.Instance == null)
+        {
+            Debug.LogError($"[DialogueRunner] Choice '{choice.Text}' requires tier condition but RelationshipSystem is missing. Disallowing choice.");
+            return false;
+        }
+
+        // Always use dialogue participants
+        VNCharacter from = _dialogueData.LeftCharacter;
+        VNCharacter to = _dialogueData.RightCharacter;
+
+        if (from == null || to == null)
+        {
+            Debug.LogError($"[DialogueRunner] Choice '{choice.Text}' requires tier condition but DialogueData participants are missing. LeftCharacter: {from?.name ?? "null"}, RightCharacter: {to?.name ?? "null"}. Disallowing choice.");
+            return false;
+        }
+
+        // No conditions → allow
+        if (choice.TierConditions == null || choice.TierConditions.Count == 0)
+            return true;
+
+        // Get current tier
+        int currentValue = RelationshipSystem.Instance.GetRelationship(from, to);
+        string currentTier = RelationshipSystem.Instance.GetRelationshipTier(from, to);
+        int currentIndex = GetTierIndex(currentTier);
+
+        string fromName = !string.IsNullOrEmpty(from.DisplayName) ? from.DisplayName : from.name;
+        string toName = !string.IsNullOrEmpty(to.DisplayName) ? to.DisplayName : to.name;
+
+        Debug.Log($"[DialogueRunner] Evaluating tier condition for choice '{choice.Text}': {fromName} -> {toName} | Value: {currentValue} | Tier: {currentTier}");
+
+        if (currentIndex == -1)
+        {
+            Debug.LogError($"[DialogueRunner] Could not resolve current tier index for '{currentTier}'. Disallowing choice '{choice.Text}'.");
+            return false;
+        }
+
+        // Evaluate each condition
+        var results = new System.Collections.Generic.List<bool>();
+        foreach (var condition in choice.TierConditions)
+        {
+            int requiredIndex = GetTierIndex(condition.RequiredTierName);
+
+            if (requiredIndex == -1)
+            {
+                Debug.LogError($"[DialogueRunner] Could not resolve required tier index for '{condition.RequiredTierName}'. Treating as failed condition.");
+                results.Add(false);
+                continue;
+            }
+
+            bool conditionPassed = condition.ComparisonMode switch
+            {
+                TierComparisonMode.GreaterOrEqual => currentIndex >= requiredIndex,
+                TierComparisonMode.LessOrEqual => currentIndex <= requiredIndex,
+                _ => true
+            };
+
+            results.Add(conditionPassed);
+        }
+
+        // Combine results using logic operator
+        bool finalResult = choice.LogicOperator switch
+        {
+            TierLogicOperator.AND => results.All(r => r),
+            TierLogicOperator.OR => results.Any(r => r),
+            _ => true
+        };
+
+        return finalResult;
+    }
+
+    private int GetTierIndex(string tierName)
+    {
+        if (RelationshipSystem.Instance == null)
+            return -1;
+
+        return RelationshipSystem.Instance.GetTierIndex(tierName);
     }
 
     private VNCharacter GetOtherActiveCharacter(VNCharacter current)

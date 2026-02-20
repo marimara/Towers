@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp-Editor::DialogueNodeEditorData
   Layouts:
   - NodeGuid: 8cb05a85-82c8-4114-b261-12c3e41402c6
-    Position: {x: -23.333334, y: 135.33334}
+    Position: {x: -124.666664, y: 208.66667}
   - NodeGuid: d17b700d-eaf7-4d16-ab03-13a346c290a5
     Position: {x: 422, y: 37.333332}
   - NodeGuid: 514b119c-0e83-46cd-bcca-40d976fbcdef
@@ -23,3 +23,5 @@ MonoBehaviour:
     Position: {x: 756, y: 38.666668}
   - NodeGuid: 77072486-8553-4ef1-87d5-86351eedc031
     Position: {x: 808.6667, y: 238.66667}
+  - NodeGuid: d692ea1c-9282-4f4c-8e93-19ad59db34a6
+    Position: {x: 422, y: 482.66666}

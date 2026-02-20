@@ -13,16 +13,24 @@ MonoBehaviour:
   m_Name: test
   m_EditorClassIdentifier: Assembly-CSharp::DialogueData
   StartNodeGuid: 8cb05a85-82c8-4114-b261-12c3e41402c6
-  LeftCharacter: {fileID: 0}
-  RightCharacter: {fileID: 0}
+  LeftCharacter: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
+  RightCharacter: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
   Nodes:
   - Guid: 8cb05a85-82c8-4114-b261-12c3e41402c6
     DisplayName: 
     Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
     Text: hey you there
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
     Choices:
     - Text: What
       NextNodeGuid: d17b700d-eaf7-4d16-ab03-13a346c290a5
+      RequiresRelationshipTier: 0
+      AllowedTiers: []
+      RequiresTierCondition: 0
+      LogicOperator: 0
+      TierConditions: []
       RelationshipChanges:
       - AutoBetweenCurrentSpeakers: 0
         From: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
@@ -36,6 +44,21 @@ MonoBehaviour:
         Mutual: 0
     - Text: Me?
       NextNodeGuid: 514b119c-0e83-46cd-bcca-40d976fbcdef
+      RequiresRelationshipTier: 0
+      AllowedTiers: []
+      RequiresTierCondition: 0
+      LogicOperator: 0
+      TierConditions: []
+      RelationshipChanges: []
+    - Text: What Love?
+      NextNodeGuid: d692ea1c-9282-4f4c-8e93-19ad59db34a6
+      RequiresRelationshipTier: 0
+      AllowedTiers: []
+      RequiresTierCondition: 1
+      LogicOperator: 1
+      TierConditions:
+      - RequiredTierName: Loyal
+        ComparisonMode: 0
       RelationshipChanges: []
     NextNodeGuid: 
     RelationshipChanges: []
@@ -43,6 +66,9 @@ MonoBehaviour:
     DisplayName: 
     Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
     Text: Come here
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
     Choices: []
     NextNodeGuid: c9708f8b-5b0a-444d-8885-ad639f0a93f9
     RelationshipChanges: []
@@ -50,6 +76,9 @@ MonoBehaviour:
     DisplayName: 
     Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
     Text: Who else would be?
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
     Choices: []
     NextNodeGuid: 77072486-8553-4ef1-87d5-86351eedc031
     RelationshipChanges: []
@@ -57,6 +86,9 @@ MonoBehaviour:
     DisplayName: 
     Speaker: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
     Text: I'm here what do you want?
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
     Choices: []
     NextNodeGuid: 
     RelationshipChanges: []
@@ -64,6 +96,19 @@ MonoBehaviour:
     DisplayName: 
     Speaker: {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
     Text: I don't want to
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
+    Choices: []
+    NextNodeGuid: 
+    RelationshipChanges: []
+  - Guid: d692ea1c-9282-4f4c-8e93-19ad59db34a6
+    DisplayName: 
+    Speaker: {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
+    Text: 'Come here '
+    OverrideParticipants: 0
+    LeftParticipant: {fileID: 0}
+    RightParticipant: {fileID: 0}
     Choices: []
     NextNodeGuid: 
     RelationshipChanges: []

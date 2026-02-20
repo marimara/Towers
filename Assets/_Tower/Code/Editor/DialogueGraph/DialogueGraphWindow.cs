@@ -17,6 +17,8 @@ public class DialogueGraphWindow : EditorWindow
 {
     private DialogueGraphView _graphView;
     private DialogueData _dialogueData;
+    private ObjectField _leftCharField;
+    private ObjectField _rightCharField;
 
     [MenuItem("VN/Dialogue Graph")]
     public static void Open()
@@ -62,6 +64,48 @@ public class DialogueGraphWindow : EditorWindow
         {
             _dialogueData = evt.newValue as DialogueData;
             _graphView.LoadData(_dialogueData);
+            
+            // Update character fields
+            if (_leftCharField != null)
+                _leftCharField.value = _dialogueData?.LeftCharacter;
+            if (_rightCharField != null)
+                _rightCharField.value = _dialogueData?.RightCharacter;
+        });
+
+        // Left Character field
+        _leftCharField = new ObjectField("Left Character")
+        {
+            objectType = typeof(VNCharacter),
+            allowSceneObjects = false,
+            value = _dialogueData?.LeftCharacter
+        };
+        _leftCharField.style.width = 200;
+        _leftCharField.RegisterValueChangedCallback(evt =>
+        {
+            if (_dialogueData != null)
+            {
+                Undo.RecordObject(_dialogueData, "Change Left Character");
+                _dialogueData.LeftCharacter = evt.newValue as VNCharacter;
+                EditorUtility.SetDirty(_dialogueData);
+            }
+        });
+
+        // Right Character field
+        _rightCharField = new ObjectField("Right Character")
+        {
+            objectType = typeof(VNCharacter),
+            allowSceneObjects = false,
+            value = _dialogueData?.RightCharacter
+        };
+        _rightCharField.style.width = 200;
+        _rightCharField.RegisterValueChangedCallback(evt =>
+        {
+            if (_dialogueData != null)
+            {
+                Undo.RecordObject(_dialogueData, "Change Right Character");
+                _dialogueData.RightCharacter = evt.newValue as VNCharacter;
+                EditorUtility.SetDirty(_dialogueData);
+            }
         });
 
         // Explicit save button — the ONLY place SaveAssets() is called at user request
@@ -77,6 +121,8 @@ public class DialogueGraphWindow : EditorWindow
         { text = "Frame All" };
 
         toolbar.Add(assetField);
+        toolbar.Add(_leftCharField);
+        toolbar.Add(_rightCharField);
         toolbar.Add(saveBtn);
         toolbar.Add(frameBtn);
 

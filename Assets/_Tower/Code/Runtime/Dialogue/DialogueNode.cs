@@ -38,6 +38,24 @@ public class DialogueNode
     public string Text;
 
     // -------------------------------------------------------------------------
+    // Conversation participants override
+    // -------------------------------------------------------------------------
+
+    [FoldoutGroup("Participants Override")]
+    [Tooltip("If true, overrides dialogue participants for relationship context in this node.")]
+    public bool OverrideParticipants;
+
+    [FoldoutGroup("Participants Override")]
+    [ShowIf(nameof(OverrideParticipants))]
+    [Tooltip("Left participant for relationship context.")]
+    public VNCharacter LeftParticipant;
+
+    [FoldoutGroup("Participants Override")]
+    [ShowIf(nameof(OverrideParticipants))]
+    [Tooltip("Right participant for relationship context.")]
+    public VNCharacter RightParticipant;
+
+    // -------------------------------------------------------------------------
     // Branching
     // -------------------------------------------------------------------------
 

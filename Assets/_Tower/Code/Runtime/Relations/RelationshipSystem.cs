@@ -119,6 +119,33 @@ public class RelationshipSystem : MonoBehaviour
     }
 
     /// <summary>
+    /// Get the tier configuration for external tier index lookups.
+    /// </summary>
+    public RelationshipTierConfig GetTierConfig()
+    {
+        return _tierConfig;
+    }
+
+    /// <summary>
+    /// Get the index of a tier by name in the RelationshipTierConfig.Tiers list.
+    /// Returns -1 if tier not found or config is null.
+    /// Tiers are evaluated in the order defined in the ScriptableObject.
+    /// </summary>
+    public int GetTierIndex(string tierName)
+    {
+        if (_tierConfig == null || _tierConfig.Tiers == null)
+            return -1;
+
+        for (int i = 0; i < _tierConfig.Tiers.Count; i++)
+        {
+            if (_tierConfig.Tiers[i].Name == tierName)
+                return i;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
     /// Reinitialize the relationship system with a new set of characters.
     /// Useful for dynamic character loading or scene transitions.
     /// </summary>

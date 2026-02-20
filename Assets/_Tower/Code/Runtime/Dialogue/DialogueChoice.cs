@@ -14,6 +14,38 @@ public class DialogueChoice
     public string NextNodeGuid;
 
     // -------------------------------------------------------------------------
+    // Relationship requirements
+    // -------------------------------------------------------------------------
+
+    [FoldoutGroup("Relationship Requirements")]
+    [Tooltip("If true, this choice is only available when relationship tier requirements are met.")]
+    public bool RequiresRelationshipTier;
+
+    [FoldoutGroup("Relationship Requirements")]
+    [ShowIf(nameof(RequiresRelationshipTier))]
+    [Tooltip("List of allowed tier names. Choice is available if current tier matches any in this list.")]
+    public System.Collections.Generic.List<string> AllowedTiers = new();
+
+    // -------------------------------------------------------------------------
+    // Tier-based visibility conditions
+    // -------------------------------------------------------------------------
+
+    [FoldoutGroup("Tier Condition")]
+    [Tooltip("If true, this choice visibility is determined by tier comparison logic.")]
+    public bool RequiresTierCondition;
+
+    [FoldoutGroup("Tier Condition")]
+    [ShowIf(nameof(RequiresTierCondition))]
+    [Tooltip("Logic operator for combining multiple tier conditions.")]
+    public TierLogicOperator LogicOperator;
+
+    [FoldoutGroup("Tier Condition")]
+    [ShowIf(nameof(RequiresTierCondition))]
+    [Tooltip("List of tier conditions. Combined using LogicOperator.")]
+    [ListDrawerSettings(ShowFoldout = true)]
+    public System.Collections.Generic.List<TierCondition> TierConditions = new();
+
+    // -------------------------------------------------------------------------
     // Relationship effects
     // -------------------------------------------------------------------------
 
