@@ -4,9 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Consequence that sets a named boolean flag in the game state to a specified value.
 ///
-/// Requires a <c>FlagManager</c> singleton (or equivalent service) that exposes
-/// <c>void SetFlag(string flagId, bool value)</c>. Wire this up when the flag
-/// system is implemented.
+/// Writes flag state via <see cref="FlagManager.SetFlag"/>.
 ///
 /// Pairs naturally with <see cref="FlagCondition"/>: an event can set a flag as
 /// a consequence so that a subsequent event whose condition checks that same flag
@@ -40,11 +38,15 @@ public sealed class FlagConsequence : EventConsequence
             return;
         }
 
-        // TODO: replace with your FlagManager singleton once implemented.
-        // FlagManager.Instance.SetFlag(FlagId, Value);
+        var manager = FlagManager.Instance;
 
-        Debug.LogWarning($"[FlagConsequence] FlagManager not yet implemented. " +
-                         $"Flag '{FlagId}' = {Value} was not written.");
+        if (manager == null)
+        {
+            Debug.LogWarning($"[FlagConsequence] FlagManager instance not found. Flag '{FlagId}' = {Value} was not written.");
+            return;
+        }
+
+        manager.SetFlag(FlagId, Value);
     }
 
     // -------------------------------------------------------------------------

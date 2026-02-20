@@ -5,8 +5,7 @@ using UnityEngine;
 /// Condition that checks whether a named boolean flag in the game state
 /// matches an expected value.
 ///
-/// Requires a <c>FlagManager</c> singleton (or equivalent service) that exposes
-/// <c>bool GetFlag(string flagId)</c>. Wire this up when the flag system is implemented.
+/// Reads flag state from <see cref="FlagManager.GetFlag"/>.
 /// </summary>
 [Serializable]
 public sealed class FlagCondition : EventCondition
@@ -35,12 +34,16 @@ public sealed class FlagCondition : EventCondition
             return false;
         }
 
-        // TODO: replace with your FlagManager singleton once implemented.
-        // bool current = FlagManager.Instance.GetFlag(FlagId);
-        // return current == ExpectedValue;
+        var manager = FlagManager.Instance;
 
-        Debug.LogWarning($"[FlagCondition] FlagManager not yet implemented. Flag '{FlagId}' check skipped — returning false.");
-        return false;
+        if (manager == null)
+        {
+            Debug.LogWarning($"[FlagCondition] FlagManager instance not found. Flag '{FlagId}' check skipped — returning false.");
+            return false;
+        }
+
+        bool current = manager.GetFlag(FlagId);
+        return current == ExpectedValue;
     }
 
     // -------------------------------------------------------------------------
