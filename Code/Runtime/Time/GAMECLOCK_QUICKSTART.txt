@@ -1,0 +1,258 @@
+================================================================================
+  GAMECLOCK - 5 MINUTE QUICKSTART
+================================================================================
+
+STEP 1: SCENE SETUP (30 seconds)
+================================================================================
+
+In your main/bootstrap scene:
+
+1. Create a new empty GameObject
+   • Name it: "GameClock"
+
+2. Add the GameClock component
+   • Inspector → Add Component → GameClock
+
+3. Done! No configuration needed.
+   • Singleton auto-initializes
+   • DontDestroyOnLoad is automatic
+   • Persists across scenes
+
+That's it for setup!
+
+================================================================================
+STEP 2: BASIC USAGE (2 minutes)
+================================================================================
+
+In any MonoBehaviour script:
+
+```csharp
+// Access current time (read-only)
+int day = GameClock.Instance.CurrentDay;
+int hour = GameClock.Instance.CurrentHour;
+
+// Advance time by hours
+GameClock.Instance.AdvanceHours(5);      // +5 hours
+GameClock.Instance.AdvanceHours(-2);     // -2 hours
+
+// Advance by action cost (semantic)
+GameClock.Instance.AdvanceByAction();    // +1 hour (default)
+GameClock.Instance.AdvanceByAction(3);   // +3 hours
+
+// Get formatted string for logging
+Debug.Log(GameClock.Instance.GetTimeAsString());  // "Day 5, Hour 14"
+```
+
+================================================================================
+STEP 3: LISTEN TO TIME CHANGES (2 minutes)
+================================================================================
+
+```csharp
+void Start()
+{
+    // Subscribe to time changes
+    GameClock.Instance.OnTimeChanged += HandleTimeChanged;
+}
+
+void HandleTimeChanged(int day, int hour)
+{
+    Debug.Log($"Time is now Day {day}, Hour {hour}");
+
+    // React to specific times
+    if (hour == 6) Debug.Log("Morning!");
+    if (hour == 18) Debug.Log("Evening!");
+    if (hour == 0) Debug.Log("Midnight!");
+}
+
+void OnDestroy()
+{
+    // IMPORTANT: Always unsubscribe to avoid memory leaks!
+    GameClock.Instance.OnTimeChanged -= HandleTimeChanged;
+}
+```
+
+================================================================================
+STEP 4: SAVE/LOAD (Optional, 30 seconds)
+================================================================================
+
+```csharp
+// When saving:
+TimeSnapshot snapshot = GameClock.Instance.GetSnapshot();
+// ... save snapshot to file ...
+
+// When loading:
+TimeSnapshot snapshot = /* ... load from file ... */;
+GameClock.Instance.LoadSnapshot(snapshot);
+// Time is now restored!
+```
+
+================================================================================
+HOUR REFERENCE
+================================================================================
+
+   0 = Midnight
+   6 = Early Morning
+  12 = Noon
+  18 = Evening
+  23 = Late Night
+
+Day 1, Hour 0 = Midnight between Day 1-2
+Day 1, Hour 12 = Noon on Day 1
+
+================================================================================
+COMMON PATTERNS
+================================================================================
+
+Pattern 1: Morning/Night Check
+  if (GameClock.Instance.CurrentHour >= 6 &&
+      GameClock.Instance.CurrentHour < 18)
+  {
+      Debug.Log("It's daytime!");
+  }
+
+Pattern 2: Action Time Cost
+  void TalkToNPC()
+  {
+      PlayDialogue();
+      GameClock.Instance.AdvanceByAction(1);  // Conversation takes 1 hour
+  }
+
+Pattern 3: Daily Reset
+  private int _lastDay = -1;
+
+  void OnTimeChanged(int day, int hour)
+  {
+      if (day != _lastDay)
+      {
+          _lastDay = day;
+          ResetDailyState();  // Runs once per day
+      }
+  }
+
+Pattern 4: Day of Week
+  int dayOfWeek = GameClock.Instance.CurrentDay % 7;
+  // 0=Sunday, 1=Monday, ..., 6=Saturday
+
+Pattern 5: Jump to Time (Testing)
+  GameClock.Instance.SetTime(10, 14);  // Day 10, 2 PM
+  GameClock.Instance.Reset();          // Back to Day 1, Hour 0
+
+================================================================================
+TIME MATH EXAMPLES
+================================================================================
+
+Hour 22 + 5 hours:
+  22 + 5 = 27 → 27 - 24 = 3, next day
+  Result: Day N+1, Hour 3
+
+Hour 2 - 5 hours:
+  2 - 5 = -3 → -3 + 24 = 21, previous day
+  Result: Day N-1, Hour 21
+
+Hour 12 + 24 hours:
+  12 + 24 = 36 → 36 - 24 = 12, next day
+  Result: Day N+1, Hour 12
+
+Hour 0 - 1 hour:
+  0 - 1 = -1 → -1 + 24 = 23, previous day
+  Result: Day N-1, Hour 23
+
+(GameClock handles all of this automatically!)
+
+================================================================================
+FREQUENTLY ASKED QUESTIONS
+================================================================================
+
+Q: How do I pause time?
+A: Don't call AdvanceHours(). Time only advances on explicit calls.
+
+Q: Can I have fractional hours (e.g., 0.5 hours)?
+A: No. Time is integer hours. Design around this.
+
+Q: How do I check "it's morning"?
+A: if (GameClock.Instance.CurrentHour >= 6 && CurrentHour < 12) { }
+
+Q: Do I need to call anything on scene load?
+A: No. GameClock persists via DontDestroyOnLoad.
+
+Q: Can I rewind time?
+A: Yes, use AdvanceHours(-amount) or SetTime(day, hour).
+
+Q: What if I don't unsubscribe from OnTimeChanged?
+A: Memory leak! Always unsubscribe in OnDestroy.
+
+Q: Can I test quickly without playing?
+A: Yes, use examples/GAMECLOCK_EXAMPLES.md for editor tools.
+
+Q: How do I handle save/load?
+A: Use GetSnapshot() and LoadSnapshot() with your save system.
+
+Q: What if I load invalid data (Hour 30)?
+A: GameClock clamps it automatically (0-23 for hours, >=1 for days).
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+Basic Functionality:
+  [ ] GameClock exists in scene (Check Hierarchy)
+  [ ] Can access CurrentDay and CurrentHour
+  [ ] AdvanceHours(5) changes time
+  [ ] AdvanceByAction(2) changes time
+  [ ] GetTimeAsString() returns formatted string
+
+Event Subscription:
+  [ ] OnTimeChanged fires when time changes
+  [ ] Event passes correct (day, hour)
+  [ ] Multiple subscribers all receive event
+  [ ] Unsubscribing in OnDestroy works
+
+Day Overflow:
+  [ ] SetTime(1, 20) + AdvanceHours(10) = Day 2, Hour 6
+  [ ] SetTime(1, 2) + AdvanceHours(-5) = Day 0, Hour 21 (clamped to D1 H23)
+  [ ] Hour 25 → Hour 1, next day
+
+Save/Load:
+  [ ] GetSnapshot() returns current time
+  [ ] LoadSnapshot() restores time
+  [ ] Roundtrip preserves time exactly
+
+Reset:
+  [ ] Reset() sets to Day 1, Hour 0
+  [ ] Reset() fires OnTimeChanged event
+
+Persistence:
+  [ ] Load new scene, time still there
+  [ ] Singleton doesn't duplicate
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Create "GameClock" GameObject (done above)
+2. Subscribe to OnTimeChanged in systems that need it
+3. Call AdvanceByAction() when actions take time
+4. Implement daily routines using day change detection
+5. Add save/load snapshots in your save system
+6. Test day overflow with SetTime(1, 20) + AdvanceHours(10)
+
+================================================================================
+NEED MORE DETAILS?
+================================================================================
+
+See full documentation:
+  • README_GAMECLOCK.md — Complete reference
+  • GAMECLOCK_EXAMPLES.md — 10 working examples
+  • GAMECLOCK_QUICK_REFERENCE.md — One-page cheat sheet
+
+Questions answered:
+  • FAQ section in README_GAMECLOCK.md
+  • Design decisions in README_GAMECLOCK.md
+  • Troubleshooting in README_GAMECLOCK.md
+
+Ready to integrate?
+  • Copy GameClock.cs to your project (already done)
+  • Create "GameClock" GameObject in main scene
+  • Start using!
+
+================================================================================

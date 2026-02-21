@@ -35,12 +35,16 @@ public sealed class TimeCondition : EventCondition
 
     protected override bool Evaluate()
     {
-        // TODO: replace with your GameClock singleton once implemented.
-        // int currentHour = GameClock.Instance.CurrentHour;
-        // return IsHourInWindow(currentHour, MinHour, MaxHour);
+        // Safe null check for GameClock singleton
+        if (GameClock.Instance == null)
+        {
+            Debug.LogWarning("[TimeCondition] GameClock.Instance is null. Time check cannot be evaluated. Returning false.");
+            return false;
+        }
 
-        Debug.LogWarning("[TimeCondition] GameClock not yet implemented. Time check skipped — returning false.");
-        return false;
+        // Read current hour from GameClock and evaluate using helper
+        int currentHour = GameClock.Instance.CurrentHour;
+        return IsHourInWindow(currentHour, MinHour, MaxHour);
     }
 
     // -------------------------------------------------------------------------

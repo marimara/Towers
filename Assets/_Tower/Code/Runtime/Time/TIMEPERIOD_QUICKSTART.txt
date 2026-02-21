@@ -1,0 +1,238 @@
+================================================================================
+  TIMEPERIOD - 2 MINUTE QUICKSTART
+================================================================================
+
+WHAT IS TIMEPERIOD?
+================================================================================
+
+TimePeriod is an enum that divides the 24-hour day into 5 meaningful periods:
+
+  LateNight  = 3–5 AM    (pre-dawn, quiet)
+  Morning    = 6–11 AM   (sunrise to midday)
+  Afternoon  = 12–5 PM   (peak activity)
+  Evening    = 6–9 PM    (sunset, social)
+  Night      = 10 PM–2 AM (darkness, sleep)
+
+That's it. Clean, simple, type-safe.
+
+================================================================================
+BASIC USAGE (30 seconds)
+================================================================================
+
+1. Access the current period:
+   TimePeriod period = GameClock.Instance.CurrentPeriod;
+
+2. Check the period:
+   if (period == TimePeriod.Morning)
+       Debug.Log("Good morning!");
+
+3. Multiple checks:
+   if (period is TimePeriod.Evening or TimePeriod.Night)
+       Debug.Log("It's getting late!");
+
+4. Switch on period:
+   switch (period)
+   {
+       case TimePeriod.Morning:
+           SetLighting(0.8f);
+           break;
+       case TimePeriod.Night:
+           SetLighting(0.3f);
+           break;
+   }
+
+That's the entire API!
+
+================================================================================
+COMMON PATTERNS (1 minute)
+================================================================================
+
+Pattern 1: Check if daytime
+  bool isDaytime = GameClock.Instance.CurrentPeriod
+      is TimePeriod.Morning or TimePeriod.Afternoon;
+
+Pattern 2: Check if nighttime
+  bool isNighttime = GameClock.Instance.CurrentPeriod
+      is TimePeriod.Night or TimePeriod.LateNight;
+
+Pattern 3: NPC availability (only available daytime)
+  bool CanTalk() => GameClock.Instance.CurrentPeriod
+      is TimePeriod.Morning or TimePeriod.Afternoon;
+
+Pattern 4: Update ambiance
+  float lighting = GameClock.Instance.CurrentPeriod switch
+  {
+      TimePeriod.LateNight => 0.2f,
+      TimePeriod.Morning => 0.8f,
+      TimePeriod.Afternoon => 1.0f,
+      TimePeriod.Evening => 0.6f,
+      TimePeriod.Night => 0.3f,
+      _ => 0.5f
+  };
+
+Pattern 5: Subscribe to period changes
+  GameClock.Instance.OnTimeChanged += (day, hour) =>
+  {
+      var period = GameClock.Instance.CurrentPeriod;
+      if (period == TimePeriod.Evening)
+          TriggerSunsetEvent();
+  };
+
+================================================================================
+HOUR-TO-PERIOD REFERENCE
+================================================================================
+
+Hour →  Period      | Hour → Period       | Hour → Period
+0-2  →  Night       | 8    → Morning      | 18   → Evening
+3-5  →  LateNight   | 12   → Afternoon    | 20   → Evening
+6-11 →  Morning     | 17   → Afternoon    | 22   → Night
+       |             | 21   → Evening      | 23   → Night
+
+================================================================================
+ZERO SETUP REQUIRED
+================================================================================
+
+That's it! TimePeriod is already part of GameClock.
+
+No configuration.
+No dependencies.
+No UI coupling.
+
+Just use it:
+
+  TimePeriod period = GameClock.Instance.CurrentPeriod;
+
+================================================================================
+TESTING
+================================================================================
+
+Jump to specific hours and check periods:
+
+  GameClock.Instance.SetTime(1, 3);   // LateNight
+  Assert.AreEqual(TimePeriod.LateNight, GameClock.Instance.CurrentPeriod);
+
+  GameClock.Instance.SetTime(1, 8);   // Morning
+  Assert.AreEqual(TimePeriod.Morning, GameClock.Instance.CurrentPeriod);
+
+  GameClock.Instance.SetTime(1, 15);  // Afternoon
+  Assert.AreEqual(TimePeriod.Afternoon, GameClock.Instance.CurrentPeriod);
+
+  GameClock.Instance.SetTime(1, 20);  // Evening
+  Assert.AreEqual(TimePeriod.Evening, GameClock.Instance.CurrentPeriod);
+
+  GameClock.Instance.SetTime(1, 23);  // Night
+  Assert.AreEqual(TimePeriod.Night, GameClock.Instance.CurrentPeriod);
+
+================================================================================
+USE CASES
+================================================================================
+
+1. NPC Schedules
+   if (GameClock.Instance.CurrentPeriod == TimePeriod.Night)
+       npc.GoToSleep();
+
+2. Location Access
+   if (GameClock.Instance.CurrentPeriod is TimePeriod.Evening or TimePeriod.Night)
+       tavern.IsOpen = true;
+
+3. Event Conditions
+   if (GameClock.Instance.CurrentPeriod is TimePeriod.Night or TimePeriod.LateNight)
+       TriggerSupernaturalEvent();
+
+4. Ambiance
+   lighting = GameClock.Instance.CurrentPeriod switch
+   {
+       TimePeriod.Afternoon => 1.0f,
+       TimePeriod.Night => 0.3f,
+       _ => 0.7f
+   };
+
+5. Gameplay Logic
+   if (GameClock.Instance.CurrentPeriod != TimePeriod.Morning)
+       ShopsAreClosed();
+
+================================================================================
+COMMON QUESTIONS
+================================================================================
+
+Q: How many periods are there?
+A: 5 periods: LateNight, Morning, Afternoon, Evening, Night
+
+Q: Can I add more periods?
+A: Yes, add enum values and update the switch in GetPeriodForHour()
+
+Q: What's the performance cost?
+A: O(1) — instant switch expression
+
+Q: Do I need to subscribe to OnTimeChanged to track period?
+A: No, just read CurrentPeriod when needed. It's automatic.
+
+Q: Can periods change mid-hour?
+A: No, only when the hour changes.
+
+Q: Is TimePeriod tied to UI?
+A: No. It's pure logic, no UI coupling.
+
+================================================================================
+ONE-LINERS
+================================================================================
+
+Current period:
+  GameClock.Instance.CurrentPeriod
+
+Is it morning?
+  GameClock.Instance.CurrentPeriod == TimePeriod.Morning
+
+Is it daytime?
+  GameClock.Instance.CurrentPeriod is TimePeriod.Morning or TimePeriod.Afternoon
+
+Is it nighttime?
+  GameClock.Instance.CurrentPeriod is TimePeriod.Night or TimePeriod.LateNight
+
+Get lighting for period:
+  float light = GameClock.Instance.CurrentPeriod switch { ... }
+
+Check in condition:
+  if (GameClock.Instance.CurrentPeriod == TimePeriod.Evening) { ... }
+
+================================================================================
+FILES CREATED
+================================================================================
+
+Code:
+  • Assets/_Tower/Code/Runtime/Time/TimePeriod.cs (enum definition)
+  • GameClock.cs modified (added CurrentPeriod property + helper)
+
+Documentation:
+  • TIMEPERIOD_GUIDE.md (complete reference)
+  • TIMEPERIOD_QUICKREF.md (quick reference)
+  • TIMEPERIOD_QUICKSTART.txt (this file)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Start using:
+   var period = GameClock.Instance.CurrentPeriod;
+
+2. Implement period-based logic:
+   - NPC schedules
+   - Location access
+   - Ambiance changes
+   - Event conditions
+
+3. Read full guide if needed:
+   See TIMEPERIOD_GUIDE.md for 5+ detailed patterns
+
+4. Extend if needed:
+   Add new periods by updating the enum and switch
+
+================================================================================
+THAT'S IT!
+================================================================================
+
+TimePeriod is production-ready, zero-setup, type-safe period-based gameplay.
+
+Status: ✅ READY TO USE
+
+Happy coding!
