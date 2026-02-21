@@ -182,4 +182,80 @@ public class CharacterStats : MonoBehaviour
         Debug.Log($"[CharacterStats] '{gameObject.name}' ResetAll — cleared {count} stat(s).");
 #endif
     }
+
+    // -------------------------------------------------------------------------
+    // Character Initialization
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Initialize this character's stats from a VNCharacter asset.
+    ///
+    /// Behavior:
+    ///   - Clears all existing stats
+    ///   - For each StartingStatEntry in character.StartingStats, sets that stat to its starting value
+    ///   - Any stat NOT listed falls back to StatDefinition.DefaultValue on first access (lazy init)
+    ///   - Respects StatDefinition.ClampToRange constraints
+    ///   - If a StatDefinition appears multiple times, last value wins (with warning)
+    ///
+    /// This method preserves the lazy-initialization pattern — stats not explicitly set
+    /// will be created from defaults when first accessed.
+    ///
+    /// Does nothing if <paramref name="character"/> is null.
+    /// </summary>
+    /// <param name="character">The VNCharacter asset defining this character's starting stats.</param>
+    public void InitializeFromCharacter(VNCharacter character)
+    {
+        if (character == null)
+        {
+            Debug.LogWarning("[CharacterStats] InitializeFromCharacter called with null VNCharacter.");
+            return;
+        }
+
+        // Clear any existing stats
+        ResetAll();
+
+        // Apply each starting stat entry
+        int appliedCount = 0;
+        int duplicateCount = 0;
+        var seenStats = new HashSet<StatDefinition>();
+
+        if (character.StartingStats != null && character.StartingStats.Count > 0)
+        {
+            foreach (var entry in character.StartingStats)
+            {
+                // Skip null stat definitions
+                if (entry.Stat == null)
+                {
+                    Debug.LogWarning($"[CharacterStats] InitializeFromCharacter: skipping null stat definition in '{character.DisplayName}'.");
+                    continue;
+                }
+
+                // Check for duplicates — last value wins
+                if (seenStats.Contains(entry.Stat))
+                {
+#if UNITY_EDITOR
+                    Debug.LogWarning($"[CharacterStats] InitializeFromCharacter: duplicate stat definition '{entry.Stat.DisplayName}' in character '{character.DisplayName}' — last value ({entry.Value}) will be used.");
+#endif
+                    duplicateCount++;
+                }
+                else
+                {
+                    seenStats.Add(entry.Stat);
+                }
+
+                // Use SetStat to respect clamping constraints
+                SetStat(entry.Stat, entry.Value);
+                appliedCount++;
+            }
+        }
+
+#if UNITY_EDITOR
+        string message = $"[CharacterStats] '{gameObject.name}' initialized from character '{character.DisplayName}' — applied {appliedCount} starting stat(s)";
+        if (duplicateCount > 0)
+        {
+            message += $" ({duplicateCount} duplicate(s) handled — last value won)";
+        }
+        Debug.Log(message + ".");
+#endif
+    }
 }

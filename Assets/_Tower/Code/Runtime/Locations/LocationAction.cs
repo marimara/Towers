@@ -58,7 +58,15 @@ public class LocationAction : ScriptableObject
         // Trigger linked event if enabled
         if (TriggersEvent && LinkedEvent != null)
         {
-            LinkedEvent.Execute();
+            // Use EventManager to trigger the event
+            if (EventManager.Instance == null)
+            {
+                Debug.LogWarning($"[LocationAction '{Id}'] EventManager.Instance is null. Event trigger skipped.");
+            }
+            else
+            {
+                EventManager.Instance.TriggerEvent(LinkedEvent);
+            }
         }
     }
 }

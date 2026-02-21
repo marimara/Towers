@@ -50,6 +50,12 @@ public class CharacterInstance : MonoBehaviour
             Debug.Log($"[CharacterInstance] Added CharacterStats component to '{gameObject.name}'.");
 #endif
         }
+
+        // Initialize character stats from definition if available
+        if (_definition != null)
+        {
+            _stats.InitializeFromCharacter(_definition);
+        }
     }
 
     // -------------------------------------------------------------------------
