@@ -56,6 +56,21 @@ public class CharacterInstance : MonoBehaviour
         {
             _stats.InitializeFromCharacter(_definition);
         }
+
+        // Register with CharacterRegistry so other systems can find this character
+        if (CharacterRegistry.Instance != null)
+        {
+            CharacterRegistry.Instance.Register(this);
+        }
+    }
+
+    private void OnDisable()
+    {
+        // Unregister from CharacterRegistry when disabled
+        if (CharacterRegistry.Instance != null)
+        {
+            CharacterRegistry.Instance.Unregister(this);
+        }
     }
 
     // -------------------------------------------------------------------------

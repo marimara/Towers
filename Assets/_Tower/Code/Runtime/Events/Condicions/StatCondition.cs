@@ -77,23 +77,22 @@ public sealed class StatCondition : EventCondition
     }
 
     /// <summary>
-    /// Find a CharacterInstance in the active scene that references the given VNCharacter definition.
-    /// Returns null if not found.
+    /// Find a CharacterInstance for the given VNCharacter definition using CharacterRegistry.
+    /// Returns null if not found or registry unavailable.
     /// </summary>
     private static CharacterInstance FindCharacterInstance(VNCharacter definition)
     {
         if (definition == null)
             return null;
 
-        // Search all CharacterInstance components in the active scene
-        var allInstances = UnityEngine.Object.FindObjectsOfType<CharacterInstance>();
-        foreach (var instance in allInstances)
+        // Query CharacterRegistry for the character instance
+        if (CharacterRegistry.Instance == null)
         {
-            if (instance.Definition == definition)
-                return instance;
+            Debug.LogWarning("[StatCondition] CharacterRegistry not available — cannot find character instance.");
+            return null;
         }
 
-        return null;
+        return CharacterRegistry.Instance.GetInstance(definition);
     }
 
     // -------------------------------------------------------------------------

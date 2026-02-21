@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4a7cfda658125c42b449a34c2967829, type: 3}
+  m_Name: New Event Data
+  m_EditorClassIdentifier: Assembly-CSharp::EventData
+  _id: 8ef980a02e0745d19cd2f864b8d8f0ec
+  DisplayName: 
+  RequiredLocation: {fileID: 0}
+  Priority: 0
+  OneTime: 0
+  AutoTrigger: 0
+  DialogueGraph: {fileID: 0}
+  Conditions:
+  - rid: 2501236610484142087
+  - rid: 2501236610484142089
+  - rid: 2501236610484142090
+  - rid: 2501236610484142348
+  Consequences:
+  - rid: 2501236610484142088
+  references:
+    version: 2
+    RefIds:
+    - rid: 2501236610484142087
+      type: {class: TimeCondition, ns: , asm: Assembly-CSharp}
+      data:
+        Negate: 0
+        MinHour: 0
+        MaxHour: 23
+    - rid: 2501236610484142088
+      type: {class: RelationshipConsequence, ns: , asm: Assembly-CSharp}
+      data:
+        Negate: 0
+        From: {fileID: 0}
+        To: {fileID: 0}
+        Delta: 0
+        Mutual: 0
+    - rid: 2501236610484142089
+      type: {class: RelationshipTierCondition, ns: , asm: Assembly-CSharp}
+      data:
+        Negate: 0
+        From: {fileID: 0}
+        To: {fileID: 0}
+        RequiredTierName: 
+    - rid: 2501236610484142090
+      type: {class: FlagCondition, ns: , asm: Assembly-CSharp}
+      data:
+        Negate: 0
+        Flag: {fileID: 0}
+        ExpectedValue: 1
+    - rid: 2501236610484142348
+      type: {class: RelationshipTierCondition, ns: , asm: Assembly-CSharp}
+      data:
+        Negate: 0
+        From: {fileID: 0}
+        To: {fileID: 0}
+        RequiredTierName: 

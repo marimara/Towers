@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 /// <summary>
@@ -7,27 +6,17 @@ using UnityEngine;
 /// Responsibilities:
 ///   - Carry the identity, description, and constraints of one stat
 ///     (ID, name, purpose, default/min/max values, clamping behaviour).
-///   - Generate its own stable ID so stat definitions are never un-identified.
 ///
+/// ID is auto-generated and managed by the base UniqueIdScriptableObject class.
 /// No runtime logic — this is a reference asset for designers to document
 /// and configure stats without touching code.
 /// </summary>
 [CreateAssetMenu(menuName = "Game/Stat Definition")]
-public class StatDefinition : ScriptableObject
+public class StatDefinition : UniqueIdScriptableObject
 {
     // -------------------------------------------------------------------------
-    // Identity
+    // Display
     // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Stable, auto-generated GUID that uniquely identifies this stat definition.
-    /// Read-only at runtime. Assigned automatically on creation; do not edit by hand.
-    /// </summary>
-    [SerializeField, HideInInspector]
-    private string _id;
-
-    /// <summary>Read-only accessor for the auto-generated ID.</summary>
-    public string Id => _id;
 
     [Tooltip("Human-readable name of this stat (e.g., \"Strength\", \"Magic\", \"Sanity\").")]
     public string DisplayName;
@@ -56,33 +45,4 @@ public class StatDefinition : ScriptableObject
     [Tooltip("When true, stat values are automatically clamped to [MinValue, MaxValue] range. " +
              "When false, values can exceed the range (useful for temporary modifiers).")]
     public bool ClampToRange = true;
-
-    // -------------------------------------------------------------------------
-    // ID generation
-    // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Called by Unity in the Editor on asset creation and on every Inspector change.
-    /// Guarantees no asset ships without a valid ID — no manual step needed.
-    /// </summary>
-    private void OnValidate()
-    {
-        EnsureIdAssigned();
-    }
-
-    /// <summary>
-    /// Assigns a new GUID to <see cref="_id"/> if it is currently empty.
-    /// Safe to call multiple times; will never overwrite an existing ID.
-    /// </summary>
-    private void EnsureIdAssigned()
-    {
-        if (!string.IsNullOrEmpty(_id))
-            return;
-
-        _id = Guid.NewGuid().ToString("N"); // 32 lowercase hex chars, no hyphens
-
-#if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(this);
-#endif
-    }
 }

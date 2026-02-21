@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fedfe55c58541846ae6dcca2b87c5cf, type: 3}
   m_Name: BloodKnight
   m_EditorClassIdentifier: Assembly-CSharp::VNCharacter
+  _id: 1396a93a24a44fb98875d0571698f5ed
   DisplayName: BloodKnight
   Portrait: {fileID: -7513424422040573772, guid: 102eb806b6dae644781e48b207c435b0, type: 3}
   NameColor: {r: 0.44654083, g: 0.060381223, b: 0.060381223, a: 1}
+  Race: 0
+  StartingStats: []

@@ -4,9 +4,11 @@ using UnityEngine;
 /// <summary>
 /// ScriptableObject representing a visual novel character.
 /// Stores display data for presentation in dialogue scenes and starting stat configuration.
+///
+/// ID is auto-generated and managed by the base UniqueIdScriptableObject class.
 /// </summary>
 [CreateAssetMenu(menuName = "VN/Character")]
-public class VNCharacter : ScriptableObject
+public class VNCharacter : UniqueIdScriptableObject
 {
     // -------------------------------------------------------------------------
     // Display Data
