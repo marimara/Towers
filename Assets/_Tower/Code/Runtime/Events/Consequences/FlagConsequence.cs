@@ -17,9 +17,8 @@ public sealed class FlagConsequence : EventConsequence
     // Data
     // -------------------------------------------------------------------------
 
-    [Tooltip("Unique identifier of the boolean flag to set " +
-             "(e.g. \"met_elara\", \"quest_started\"). Must match the ID used in FlagCondition.")]
-    public string FlagId;
+    [Tooltip("The flag definition to set. The flag's DisplayName is used in logs and descriptions.")]
+    public FlagDefinition Flag;
 
     [Tooltip("The value to write to the flag.\n" +
              "• true  → set the flag\n" +
@@ -32,9 +31,15 @@ public sealed class FlagConsequence : EventConsequence
 
     protected override void Execute()
     {
-        if (string.IsNullOrEmpty(FlagId))
+        if (Flag == null)
         {
-            Debug.LogWarning("[FlagConsequence] FlagId is empty — consequence will not write anything.");
+            Debug.LogWarning("[FlagConsequence] Flag is null — consequence will not write anything.");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(Flag.Id))
+        {
+            Debug.LogWarning($"[FlagConsequence] Flag '{Flag.DisplayName}' has no ID — consequence will not write anything.");
             return;
         }
 
@@ -42,11 +47,11 @@ public sealed class FlagConsequence : EventConsequence
 
         if (manager == null)
         {
-            Debug.LogWarning($"[FlagConsequence] FlagManager instance not found. Flag '{FlagId}' = {Value} was not written.");
+            Debug.LogWarning($"[FlagConsequence] FlagManager instance not found. Flag '{Flag.DisplayName}' = {Value} was not written.");
             return;
         }
 
-        manager.SetFlag(FlagId, Value);
+        manager.SetFlag(Flag.Id, Value);
     }
 
     // -------------------------------------------------------------------------
@@ -54,5 +59,7 @@ public sealed class FlagConsequence : EventConsequence
     // -------------------------------------------------------------------------
 
     public override string Describe() =>
-        $"Set Flag '{FlagId}' = {Value}";
+        Flag != null
+            ? $"Set Flag '{Flag.DisplayName}' = {Value}"
+            : "[Flag not assigned]";
 }

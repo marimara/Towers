@@ -14,8 +14,8 @@ public sealed class FlagCondition : EventCondition
     // Data
     // -------------------------------------------------------------------------
 
-    [Tooltip("Unique identifier of the boolean flag to check (e.g. \"met_elara\", \"quest_started\").")]
-    public string FlagId;
+    [Tooltip("The flag definition to check. The flag's DisplayName is used in logs and descriptions.")]
+    public FlagDefinition Flag;
 
     [Tooltip("The value the flag must hold for this condition to pass.\n" +
              "• true  → flag must be set\n" +
@@ -28,9 +28,15 @@ public sealed class FlagCondition : EventCondition
 
     protected override bool Evaluate()
     {
-        if (string.IsNullOrEmpty(FlagId))
+        if (Flag == null)
         {
-            Debug.LogWarning("[FlagCondition] FlagId is empty — condition will always fail.");
+            Debug.LogWarning("[FlagCondition] Flag is null — condition will always fail.");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(Flag.Id))
+        {
+            Debug.LogWarning($"[FlagCondition] Flag '{Flag.DisplayName}' has no ID — condition will always fail.");
             return false;
         }
 
@@ -38,11 +44,11 @@ public sealed class FlagCondition : EventCondition
 
         if (manager == null)
         {
-            Debug.LogWarning($"[FlagCondition] FlagManager instance not found. Flag '{FlagId}' check skipped — returning false.");
+            Debug.LogWarning($"[FlagCondition] FlagManager instance not found. Flag '{Flag.DisplayName}' check skipped — returning false.");
             return false;
         }
 
-        bool current = manager.GetFlag(FlagId);
+        bool current = manager.GetFlag(Flag.Id);
         return current == ExpectedValue;
     }
 
@@ -51,5 +57,7 @@ public sealed class FlagCondition : EventCondition
     // -------------------------------------------------------------------------
 
     public override string Describe() =>
-        $"Flag '{FlagId}' {(Negate ? "!=" : "==")} {ExpectedValue}";
+        Flag != null
+            ? $"Flag '{Flag.DisplayName}' {(Negate ? "!=" : "==")} {ExpectedValue}"
+            : "[Flag not assigned]";
 }
