@@ -2,15 +2,17 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Consequence that modifies a player stat by a signed delta after an event completes.
+/// Consequence that modifies a character's stat by a signed delta after an event completes.
 ///
-/// Requires a <c>StatManager</c> singleton (or equivalent service) that exposes
-/// <c>void ModifyStat(StatType type, int delta)</c>. Wire this up when the stat
-/// system is implemented.
+/// Works with <see cref="StatManager"/> singleton and modifies the target character's stats.
+/// Requires both a <see cref="VNCharacter"/> definition and <see cref="StatDefinition"/> to be assigned.
 ///
-/// Pairs naturally with <see cref="StatCondition"/>: an event can lower or raise a
-/// stat as a consequence so that subsequent condition checks against that same stat
-/// immediately reflect the change during the recheck in <see cref="EventManager"/>.
+/// Design:
+///   - Looks up the character instance in the scene by their VNCharacter definition.
+///   - Calls StatManager.ModifyStat() to update the character's stat by the given delta.
+///   - Pairs naturally with <see cref="StatCondition"/>: an event can lower or raise a
+///     stat as a consequence so that subsequent condition checks against that same stat
+///     immediately reflect the change during the recheck in <see cref="EventManager"/>.
 /// </summary>
 [Serializable]
 public sealed class StatConsequence : EventConsequence
@@ -19,8 +21,11 @@ public sealed class StatConsequence : EventConsequence
     // Data
     // -------------------------------------------------------------------------
 
-    [Tooltip("Which player stat to modify.")]
-    public StatType Stat;
+    [Tooltip("The character whose stat to modify. This is matched against CharacterInstance components in the scene.")]
+    public VNCharacter Character;
+
+    [Tooltip("The stat definition to modify.")]
+    public StatDefinition Stat;
 
     [Tooltip("Amount to add to the stat. Positive values increase it; negative values decrease it.")]
     public int Delta;
@@ -31,17 +36,71 @@ public sealed class StatConsequence : EventConsequence
 
     protected override void Execute()
     {
-        // TODO: replace with your StatManager singleton once implemented.
-        // StatManager.Instance.ModifyStat(Stat, Delta);
+        // --- Guard: Character reference ---
+        if (Character == null)
+        {
+            Debug.LogWarning("[StatConsequence] Character is null — consequence skipped.");
+            return;
+        }
 
-        Debug.LogWarning($"[StatConsequence] StatManager not yet implemented. " +
-                         $"Stat '{Stat}' delta {Delta:+#;-#;0} was not applied.");
+        // --- Guard: Stat reference ---
+        if (Stat == null)
+        {
+            Debug.LogWarning("[StatConsequence] Stat is null — consequence skipped.");
+            return;
+        }
+
+        // --- Guard: StatManager singleton ---
+        var statManager = StatManager.Instance;
+        if (statManager == null)
+        {
+            Debug.LogWarning("[StatConsequence] StatManager instance not found — consequence skipped.");
+            return;
+        }
+
+        // --- Find the character instance in the scene ---
+        var characterInstance = FindCharacterInstance(Character);
+        if (characterInstance == null)
+        {
+            Debug.LogWarning($"[StatConsequence] Character '{Character.DisplayName}' instance not found in scene — consequence skipped.");
+            return;
+        }
+
+        // --- Modify the stat ---
+        if (Delta != 0)
+        {
+            statManager.ModifyStat(characterInstance, Stat, Delta);
+        }
+    }
+
+    /// <summary>
+    /// Find a CharacterInstance in the active scene that references the given VNCharacter definition.
+    /// Returns null if not found.
+    /// </summary>
+    private static CharacterInstance FindCharacterInstance(VNCharacter definition)
+    {
+        if (definition == null)
+            return null;
+
+        // Search all CharacterInstance components in the active scene
+        var allInstances = UnityEngine.Object.FindObjectsOfType<CharacterInstance>();
+        foreach (var instance in allInstances)
+        {
+            if (instance.Definition == definition)
+                return instance;
+        }
+
+        return null;
     }
 
     // -------------------------------------------------------------------------
     // Debug
     // -------------------------------------------------------------------------
 
-    public override string Describe() =>
-        $"Modify Stat {Stat} by {Delta:+#;-#;0}";
+    public override string Describe()
+    {
+        string characterName = Character != null ? Character.DisplayName : "[Character not assigned]";
+        string statName = Stat != null ? Stat.DisplayName : "[Stat not assigned]";
+        return $"Modify {characterName}'s {statName} by {Delta:+#;-#;0}";
+    }
 }

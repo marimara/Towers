@@ -2,11 +2,17 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Condition that checks whether a player stat satisfies a numeric threshold
+/// Condition that checks whether a character's stat satisfies a numeric threshold
 /// using a <see cref="ComparisonOperator"/>.
 ///
-/// Requires a <c>StatManager</c> singleton (or equivalent service) that exposes
-/// <c>int GetStat(StatType type)</c>. Wire this up when the stat system is implemented.
+/// Works with <see cref="StatManager"/> singleton and queries the target character's stats.
+/// Requires both a <see cref="VNCharacter"/> definition and <see cref="StatDefinition"/> to be assigned.
+///
+/// Design:
+///   - Looks up the character instance in the scene by their VNCharacter definition.
+///   - Queries the character's stat value via StatManager.
+///   - Compares the stat value against the threshold using the configured operator.
+///   - Guards against missing references, StatManager, or character instance gracefully.
 /// </summary>
 [Serializable]
 public sealed class StatCondition : EventCondition
@@ -15,8 +21,11 @@ public sealed class StatCondition : EventCondition
     // Data
     // -------------------------------------------------------------------------
 
-    [Tooltip("Which player stat to evaluate.")]
-    public StatType StatType;
+    [Tooltip("The character whose stat to evaluate. This is matched against CharacterInstance components in the scene.")]
+    public VNCharacter Character;
+
+    [Tooltip("The stat definition to evaluate.")]
+    public StatDefinition Stat;
 
     [Tooltip("How to compare the runtime stat value against the threshold.")]
     public ComparisonOperator Comparison;
@@ -30,12 +39,61 @@ public sealed class StatCondition : EventCondition
 
     protected override bool Evaluate()
     {
-        // TODO: replace with your StatManager singleton once implemented.
-        // int statValue = StatManager.Instance.GetStat(StatType);
-        // return ApplyComparison(statValue, Value);
+        // --- Guard: Character reference ---
+        if (Character == null)
+        {
+            Debug.LogWarning("[StatCondition] Character is null — condition will always fail.");
+            return false;
+        }
 
-        Debug.LogWarning($"[StatCondition] StatManager not yet implemented. Stat '{StatType}' check skipped — returning false.");
-        return false;
+        // --- Guard: Stat reference ---
+        if (Stat == null)
+        {
+            Debug.LogWarning("[StatCondition] Stat is null — condition will always fail.");
+            return false;
+        }
+
+        // --- Guard: StatManager singleton ---
+        var statManager = StatManager.Instance;
+        if (statManager == null)
+        {
+            Debug.LogWarning("[StatCondition] StatManager instance not found — returning false.");
+            return false;
+        }
+
+        // --- Find the character instance in the scene ---
+        var characterInstance = FindCharacterInstance(Character);
+        if (characterInstance == null)
+        {
+            Debug.LogWarning($"[StatCondition] Character '{Character.DisplayName}' instance not found in scene — returning false.");
+            return false;
+        }
+
+        // --- Query the stat value ---
+        int statValue = statManager.GetStat(characterInstance, Stat);
+
+        // --- Apply the comparison ---
+        return ApplyComparison(statValue, Comparison, Value);
+    }
+
+    /// <summary>
+    /// Find a CharacterInstance in the active scene that references the given VNCharacter definition.
+    /// Returns null if not found.
+    /// </summary>
+    private static CharacterInstance FindCharacterInstance(VNCharacter definition)
+    {
+        if (definition == null)
+            return null;
+
+        // Search all CharacterInstance components in the active scene
+        var allInstances = UnityEngine.Object.FindObjectsOfType<CharacterInstance>();
+        foreach (var instance in allInstances)
+        {
+            if (instance.Definition == definition)
+                return instance;
+        }
+
+        return null;
     }
 
     // -------------------------------------------------------------------------
@@ -66,6 +124,10 @@ public sealed class StatCondition : EventCondition
         _                                 => "?",
     };
 
-    public override string Describe() =>
-        $"Stat {StatType} {OperatorSymbol(Comparison)} {Value}";
+    public override string Describe()
+    {
+        string characterName = Character != null ? Character.DisplayName : "[Character not assigned]";
+        string statName = Stat != null ? Stat.DisplayName : "[Stat not assigned]";
+        return $"{characterName}'s {statName} {OperatorSymbol(Comparison)} {Value}";
+    }
 }
