@@ -44,11 +44,6 @@ public class EventManager : MonoBehaviour
              "Must be assigned — EventManager cannot trigger dialogue without it.")]
     [SerializeField] private DialogueRunner _dialogueRunner;
 
-    [Header("Events")]
-    [Tooltip("All EventData assets the system should evaluate. " +
-             "Add every event asset here; the manager filters eligible ones at runtime.")]
-    [SerializeField] private List<EventData> _allEvents = new();
-
     // -------------------------------------------------------------------------
     // C# Events
     // -------------------------------------------------------------------------
@@ -79,6 +74,13 @@ public class EventManager : MonoBehaviour
     /// <summary>The event whose dialogue is currently playing, if any.</summary>
     private EventData _activeEvent;
 
+    /// <summary>
+    /// Tracks cooldown cycles for events by ID.
+    /// Prevents event starvation by blocking recently-triggered events from
+    /// triggering again immediately. Cooldown decrements each evaluation cycle.
+    /// </summary>
+    private readonly Dictionary<string, int> _eventCooldowns = new();
+
     // -------------------------------------------------------------------------
     // Unity lifecycle
     // -------------------------------------------------------------------------
@@ -101,6 +103,16 @@ public class EventManager : MonoBehaviour
         ResolveLocationManager();
         ValidateReferences();
         SubscribeToLocationManager();
+
+        LocationData currentLocation = _locationManager != null
+            ? _locationManager.GetCurrentLocation()
+            : null;
+
+        if (currentLocation != null)
+        {
+            EvaluateEventsForLocation(currentLocation);
+            Debug.Log("[EventManager] DEBUG initial event evaluation");
+        }
     }
 
     private void OnDestroy()
@@ -208,18 +220,35 @@ public class EventManager : MonoBehaviour
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Filters all registered events down to those eligible at
-    /// <paramref name="location"/>, selects the highest-priority one,
-    /// and auto-triggers it if <see cref="EventData.AutoTrigger"/> is set.
+    /// Filters events from the location's PossibleEvents list down to those eligible,
+    /// selects the highest-priority one, and auto-triggers it if
+    /// <see cref="EventData.AutoTrigger"/> is set.
     /// </summary>
     private void EvaluateEventsForLocation(LocationData location)
     {
-        if (_allEvents == null || _allEvents.Count == 0)
+        if (location == null)
             return;
 
-        EventData best = null;
+        // Decrease all active cooldowns
+        var cooldownIds = new List<string>(_eventCooldowns.Keys);
+        foreach (string id in cooldownIds)
+        {
+            _eventCooldowns[id]--;
+            if (_eventCooldowns[id] <= 0)
+                _eventCooldowns.Remove(id);
+        }
 
-        foreach (EventData eventData in _allEvents)
+        if (location.PossibleEvents == null || location.PossibleEvents.Count == 0)
+        {
+            Debug.Log($"[EventManager] No events configured for location '{location.DisplayName}'");
+            return;
+        }
+
+        // Collect all eligible events
+        var eligibleEvents = new List<EventData>();
+        float totalWeight = 0f;
+
+        foreach (EventData eventData in location.PossibleEvents)
         {
             if (eventData == null)
                 continue;
@@ -227,33 +256,58 @@ public class EventManager : MonoBehaviour
             if (!IsEligible(eventData, location))
                 continue;
 
-            if (best == null || eventData.Priority > best.Priority)
-                best = eventData;
+            eligibleEvents.Add(eventData);
+            totalWeight += eventData.Priority;
         }
 
-        if (best == null)
+        if (eligibleEvents.Count == 0)
         {
-            Debug.Log("[EventManager] No eligible events found for this location.");
+            Debug.Log($"[EventManager] No eligible events found at '{location.DisplayName}'");
             return;
         }
 
-        if (!best.AutoTrigger)
+        // Weighted random selection based on Priority
+        EventData selected = null;
+        if (eligibleEvents.Count == 1)
         {
-            Debug.Log($"[EventManager] Eligible event '{best.DisplayName}' (Priority {best.Priority}) found " +
+            selected = eligibleEvents[0];
+        }
+        else
+        {
+            float randomValue = UnityEngine.Random.value * totalWeight;
+            float accumulator = 0f;
+            foreach (EventData eventData in eligibleEvents)
+            {
+                accumulator += eventData.Priority;
+                if (randomValue <= accumulator)
+                {
+                    selected = eventData;
+                    break;
+                }
+            }
+            // Fallback to last event if rounding error occurs
+            if (selected == null)
+                selected = eligibleEvents[eligibleEvents.Count - 1];
+        }
+
+        if (!selected.AutoTrigger)
+        {
+            Debug.Log($"[EventManager] Eligible event '{selected.DisplayName}' (Priority {selected.Priority}) found " +
                       "but AutoTrigger is false — skipping automatic trigger.");
             return;
         }
 
-        Debug.Log($"[EventManager] Auto-triggering event '{best.DisplayName}' (Priority {best.Priority}).");
-        ExecuteTrigger(best);
+        Debug.Log($"[EventManager] Auto-triggering event '{selected.DisplayName}' (Priority {selected.Priority}).");
+        ExecuteTrigger(selected);
     }
 
     /// <summary>
     /// Returns true when <paramref name="eventData"/> passes all eligibility
     /// checks for the given location:
     /// 1. RequiredLocation matches (or is unset).
-    /// 2. Not already completed (if OneTime).
-    /// 3. All Conditions are met.
+    /// 2. Not on cooldown (prevent event starvation).
+    /// 3. Not already completed (if OneTime).
+    /// 4. All Conditions are met.
     /// </summary>
     private bool IsEligible(EventData eventData, LocationData currentLocation)
     {
@@ -261,11 +315,15 @@ public class EventManager : MonoBehaviour
         if (eventData.RequiredLocation != null && eventData.RequiredLocation != currentLocation)
             return false;
 
-        // --- 2. One-time check -------------------------------------------
+        // --- 2. Cooldown check -------------------------------------------
+        if (!string.IsNullOrEmpty(eventData.Id) && _eventCooldowns.ContainsKey(eventData.Id))
+            return false;
+
+        // --- 3. One-time check -------------------------------------------
         if (eventData.OneTime && IsCompleted(eventData))
             return false;
 
-        // --- 3. Conditions -----------------------------------------------
+        // --- 4. Conditions -----------------------------------------------
         if (eventData.Conditions != null)
         {
             foreach (EventCondition condition in eventData.Conditions)
@@ -351,6 +409,10 @@ public class EventManager : MonoBehaviour
             MarkCompleted(eventData);
             Debug.Log($"[EventManager] OneTime event '{eventData.DisplayName}' marked as completed.");
         }
+
+        // Set cooldown to prevent immediate re-trigger
+        if (!string.IsNullOrEmpty(eventData.Id))
+            _eventCooldowns[eventData.Id] = 1;
 
         ApplyConsequences(eventData);
 
@@ -446,20 +508,12 @@ public class EventManager : MonoBehaviour
 
     private void ValidateReferences()
     {
+        if (_locationManager == null)
+            Debug.LogWarning("[EventManager] LocationManager is not assigned. " +
+                             "Assign it in the Inspector or ensure LocationManager is in the scene.", this);
+
         if (_dialogueRunner == null)
             Debug.LogWarning("[EventManager] DialogueRunner is not assigned. " +
                              "Events with dialogue graphs will complete immediately without playing.", this);
-
-        if (_allEvents == null || _allEvents.Count == 0)
-            Debug.LogWarning("[EventManager] _allEvents list is empty. No events will be evaluated.", this);
-        else
-        {
-            int nullCount = 0;
-            foreach (var e in _allEvents)
-                if (e == null) nullCount++;
-
-            if (nullCount > 0)
-                Debug.LogWarning($"[EventManager] _allEvents contains {nullCount} null slot(s). Clean up the Inspector list.", this);
-        }
     }
 }

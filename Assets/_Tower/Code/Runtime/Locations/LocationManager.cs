@@ -37,6 +37,12 @@ public class LocationManager : MonoBehaviour
 
     public void ChangeLocation(LocationData newLocation)
     {
+        if (newLocation == null)
+        {
+            Debug.Log("[LocationManager] Attempted to change to null location.");
+            return;
+        }
+
         var previousLocation = _currentLocation;
         _currentLocation = newLocation;
 

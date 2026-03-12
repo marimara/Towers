@@ -21,7 +21,8 @@
       "Bash(del /F \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs\")",
       "Bash(del /F \"C:\\\\Users\\\\maria\\\\UnityGit\\\\Towers\\\\Assets\\\\_Tower\\\\Code\\\\Runtime\\\\EventData.cs.meta\")",
       "mcp__coplay-mcp__execute_script",
-      "mcp__coplay-mcp__check_compile_errors"
+      "mcp__coplay-mcp__check_compile_errors",
+      "Bash(unset CLAUDECODE)"
     ]
   }
 }

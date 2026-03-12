@@ -10,24 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c4a7cfda658125c42b449a34c2967829, type: 3}
-  m_Name: New Event Data
+  m_Name: New
   m_EditorClassIdentifier: Assembly-CSharp::EventData
-  _id: 8ef980a02e0745d19cd2f864b8d8f0ec
-  DisplayName: Meet BloodKnight
+  _id: e10415ca03ed461c941f569098c9abba
+  DisplayName: fsgsdfgsdfg
   RequiredLocation: {fileID: 11400000, guid: 65ff2f90b7b8a0f498ae829d3f10ae01, type: 2}
-  Priority: 100
+  Priority: 50
   OneTime: 1
   AutoTrigger: 1
-  DialogueGraph: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
+  DialogueGraph: {fileID: 11400000, guid: c5fd32fd71e71d84aacf2b27d21e0a20, type: 2}
   Conditions: []
-  Consequences:
-  - rid: 2201677766090293510
+  Consequences: []
   references:
     version: 2
-    RefIds:
-    - rid: 2201677766090293510
-      type: {class: FlagConsequence, ns: , asm: Assembly-CSharp}
-      data:
-        Negate: 0
-        Flag: {fileID: 11400000, guid: 16d906a2061cceb4491dfbaa60df2da7, type: 2}
-        Value: 1
+    RefIds: []

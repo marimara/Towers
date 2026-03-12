@@ -20,5 +20,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f1a37a84057ed394ab8257380e30c541, type: 2}
   - {fileID: 11400000, guid: 8c9a1b2b479b40e4cb51e703d475badb, type: 2}
   AvailableActions: []
-  PossibleEvents: []
+  PossibleEvents:
+  - {fileID: 11400000, guid: 137f2d1cc5474f14880cc117971c0fdc, type: 2}
+  - {fileID: 11400000, guid: 31b1a051ca27eef42b3f4a03f2bbb221, type: 2}
   Tags: 01000000
