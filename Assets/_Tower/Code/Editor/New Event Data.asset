@@ -13,53 +13,21 @@ MonoBehaviour:
   m_Name: New Event Data
   m_EditorClassIdentifier: Assembly-CSharp::EventData
   _id: 8ef980a02e0745d19cd2f864b8d8f0ec
-  DisplayName: 
-  RequiredLocation: {fileID: 0}
+  DisplayName: Meet BloodKnight
+  RequiredLocation: {fileID: 11400000, guid: 65ff2f90b7b8a0f498ae829d3f10ae01, type: 2}
   Priority: 0
-  OneTime: 0
-  AutoTrigger: 0
-  DialogueGraph: {fileID: 0}
-  Conditions:
-  - rid: 2501236610484142087
-  - rid: 2501236610484142089
-  - rid: 2501236610484142090
-  - rid: 2501236610484142348
+  OneTime: 1
+  AutoTrigger: 1
+  DialogueGraph: {fileID: 11400000, guid: e7fe736c01d319042b8be32427783512, type: 2}
+  Conditions: []
   Consequences:
-  - rid: 2501236610484142088
+  - rid: 2201677766090293510
   references:
     version: 2
     RefIds:
-    - rid: 2501236610484142087
-      type: {class: TimeCondition, ns: , asm: Assembly-CSharp}
+    - rid: 2201677766090293510
+      type: {class: FlagConsequence, ns: , asm: Assembly-CSharp}
       data:
         Negate: 0
-        MinHour: 0
-        MaxHour: 23
-    - rid: 2501236610484142088
-      type: {class: RelationshipConsequence, ns: , asm: Assembly-CSharp}
-      data:
-        Negate: 0
-        From: {fileID: 0}
-        To: {fileID: 0}
-        Delta: 0
-        Mutual: 0
-    - rid: 2501236610484142089
-      type: {class: RelationshipTierCondition, ns: , asm: Assembly-CSharp}
-      data:
-        Negate: 0
-        From: {fileID: 0}
-        To: {fileID: 0}
-        RequiredTierName: 
-    - rid: 2501236610484142090
-      type: {class: FlagCondition, ns: , asm: Assembly-CSharp}
-      data:
-        Negate: 0
-        Flag: {fileID: 0}
-        ExpectedValue: 1
-    - rid: 2501236610484142348
-      type: {class: RelationshipTierCondition, ns: , asm: Assembly-CSharp}
-      data:
-        Negate: 0
-        From: {fileID: 0}
-        To: {fileID: 0}
-        RequiredTierName: 
+        Flag: {fileID: 11400000, guid: 16d906a2061cceb4491dfbaa60df2da7, type: 2}
+        Value: 1
