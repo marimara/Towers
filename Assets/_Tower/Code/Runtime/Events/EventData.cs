@@ -42,6 +42,10 @@ public class EventData : UniqueIdScriptableObject
              "The event system is responsible for tracking completion.")]
     public bool OneTime;
 
+    [Min(0)]
+    [Tooltip("Cooldown cycles before this event can trigger again. Only used if OneTime is false.")]
+    public int Cooldown = 0;
+
     [Tooltip("If true, the event system may fire this event automatically when all " +
              "conditions pass, without requiring explicit player action.")]
     public bool AutoTrigger;

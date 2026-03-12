@@ -44,6 +44,11 @@ public class EventManager : MonoBehaviour
              "Must be assigned — EventManager cannot trigger dialogue without it.")]
     [SerializeField] private DialogueRunner _dialogueRunner;
 
+    [Header("Behavior")]
+    [Tooltip("If true, allow events to trigger other events immediately after completion. " +
+             "If false, events are only evaluated when location changes or world state updates.")]
+    [SerializeField] private bool allowEventChains = false;
+
     // -------------------------------------------------------------------------
     // C# Events
     // -------------------------------------------------------------------------
@@ -103,6 +108,7 @@ public class EventManager : MonoBehaviour
         ResolveLocationManager();
         ValidateReferences();
         SubscribeToLocationManager();
+        SubscribeToGameClock();
 
         LocationData currentLocation = _locationManager != null
             ? _locationManager.GetCurrentLocation()
@@ -118,6 +124,7 @@ public class EventManager : MonoBehaviour
     private void OnDestroy()
     {
         UnsubscribeFromLocationManager();
+        UnsubscribeFromGameClock();
 
         if (Instance == this)
             Instance = null;
@@ -410,17 +417,17 @@ public class EventManager : MonoBehaviour
             Debug.Log($"[EventManager] OneTime event '{eventData.DisplayName}' marked as completed.");
         }
 
-        // Set cooldown to prevent immediate re-trigger
-        if (!string.IsNullOrEmpty(eventData.Id))
-            _eventCooldowns[eventData.Id] = 1;
+        // Set cooldown to prevent immediate re-trigger (only for repeatable events)
+        if (!eventData.OneTime && eventData.Cooldown > 0 && !string.IsNullOrEmpty(eventData.Id))
+            _eventCooldowns[eventData.Id] = eventData.Cooldown;
 
         ApplyConsequences(eventData);
 
         _activeEvent = null;
         OnEventCompleted?.Invoke(eventData);
 
-        // Re-evaluate so newly eligible events can trigger without a location change.
-        RecheckEventsAtCurrentLocation();
+        if (allowEventChains)
+            RecheckEventsAtCurrentLocation();
     }
 
     /// <summary>
@@ -504,6 +511,37 @@ public class EventManager : MonoBehaviour
     {
         if (_locationManager != null)
             _locationManager.OnLocationChanged -= OnLocationChanged;
+    }
+
+    private void SubscribeToGameClock()
+    {
+        if (GameClock.Instance != null)
+            GameClock.Instance.OnTimeChanged += OnTimeChanged;
+    }
+
+    private void UnsubscribeFromGameClock()
+    {
+        if (GameClock.Instance != null)
+            GameClock.Instance.OnTimeChanged -= OnTimeChanged;
+    }
+
+    private void OnTimeChanged(int day, int hour)
+    {
+        EvaluateCurrentLocation();
+    }
+
+    /// <summary>
+    /// Evaluates all eligible events at the current location.
+    /// Called by other systems to trigger event evaluation when world state changes.
+    /// </summary>
+    public void EvaluateCurrentLocation()
+    {
+        LocationData currentLocation = _locationManager != null
+            ? _locationManager.GetCurrentLocation()
+            : LocationManager.Instance?.GetCurrentLocation();
+
+        if (currentLocation != null)
+            EvaluateEventsForLocation(currentLocation);
     }
 
     private void ValidateReferences()
