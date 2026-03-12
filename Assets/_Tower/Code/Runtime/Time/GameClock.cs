@@ -43,6 +43,18 @@ public class GameClock : MonoBehaviour
     /// </summary>
     public event Action<int, int> OnTimeChanged;
 
+    /// <summary>
+    /// Fired when the in-game day changes.
+    /// Useful for daily reset events and day-specific logic.
+    /// </summary>
+    public event Action OnNewDay;
+
+    /// <summary>
+    /// Fired when the time period changes (morning, afternoon, evening, night, late night).
+    /// Useful for ambiance changes and period-specific events.
+    /// </summary>
+    public event Action<TimePeriod> OnPeriodChanged;
+
     // -------------------------------------------------------------------------
     // Properties - Read-only access to time
     // -------------------------------------------------------------------------
@@ -113,6 +125,7 @@ public class GameClock : MonoBehaviour
         // Store old time for comparison
         int previousDay = _currentDay;
         int previousHour = _currentHour;
+        TimePeriod previousPeriod = GetPeriodForHour(previousHour);
 
         // Add hours to current hour
         _currentHour += amount;
@@ -132,9 +145,13 @@ public class GameClock : MonoBehaviour
             _currentDay--;
         }
 
+        // Compute new period
+        TimePeriod newPeriod = GetPeriodForHour(_currentHour);
+
         // Fire event if time changed
         bool dayChanged = _currentDay != previousDay;
         bool hourChanged = _currentHour != previousHour;
+        bool periodChanged = newPeriod != previousPeriod;
 
         if (dayChanged || hourChanged)
         {
@@ -143,6 +160,14 @@ public class GameClock : MonoBehaviour
 #endif
             OnTimeChanged?.Invoke(_currentDay, _currentHour);
         }
+
+        // Fire day change event
+        if (dayChanged)
+            OnNewDay?.Invoke();
+
+        // Fire period change event
+        if (periodChanged)
+            OnPeriodChanged?.Invoke(newPeriod);
     }
 
     /// <summary>

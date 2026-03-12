@@ -49,6 +49,9 @@ public class EventManager : MonoBehaviour
              "If false, events are only evaluated when location changes or world state updates.")]
     [SerializeField] private bool allowEventChains = false;
 
+    [Tooltip("Maximum number of events that can trigger during a single evaluation.")]
+    [SerializeField] private int maxEventsPerEvaluation = 1;
+
     // -------------------------------------------------------------------------
     // C# Events
     // -------------------------------------------------------------------------
@@ -85,6 +88,9 @@ public class EventManager : MonoBehaviour
     /// triggering again immediately. Cooldown decrements each evaluation cycle.
     /// </summary>
     private readonly Dictionary<string, int> _eventCooldowns = new();
+
+    /// <summary>Number of events triggered during the current evaluation cycle.</summary>
+    private int _eventsTriggeredThisEvaluation = 0;
 
     // -------------------------------------------------------------------------
     // Unity lifecycle
@@ -236,6 +242,8 @@ public class EventManager : MonoBehaviour
         if (location == null)
             return;
 
+        _eventsTriggeredThisEvaluation = 0;
+
         // Decrease all active cooldowns
         var cooldownIds = new List<string>(_eventCooldowns.Keys);
         foreach (string id in cooldownIds)
@@ -360,6 +368,10 @@ public class EventManager : MonoBehaviour
     /// </summary>
     private void ExecuteTrigger(EventData eventData)
     {
+        if (_eventsTriggeredThisEvaluation >= maxEventsPerEvaluation)
+            return;
+
+        _eventsTriggeredThisEvaluation++;
         _activeEvent = eventData;
 
         OnEventTriggered?.Invoke(eventData);
@@ -516,16 +528,34 @@ public class EventManager : MonoBehaviour
     private void SubscribeToGameClock()
     {
         if (GameClock.Instance != null)
+        {
             GameClock.Instance.OnTimeChanged += OnTimeChanged;
+            GameClock.Instance.OnPeriodChanged += OnPeriodChanged;
+            GameClock.Instance.OnNewDay += OnNewDay;
+        }
     }
 
     private void UnsubscribeFromGameClock()
     {
         if (GameClock.Instance != null)
+        {
             GameClock.Instance.OnTimeChanged -= OnTimeChanged;
+            GameClock.Instance.OnPeriodChanged -= OnPeriodChanged;
+            GameClock.Instance.OnNewDay -= OnNewDay;
+        }
     }
 
     private void OnTimeChanged(int day, int hour)
+    {
+        EvaluateCurrentLocation();
+    }
+
+    private void OnPeriodChanged(TimePeriod newPeriod)
+    {
+        EvaluateCurrentLocation();
+    }
+
+    private void OnNewDay()
     {
         EvaluateCurrentLocation();
     }
